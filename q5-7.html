@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOEIC Speaking Q5-7 실전연습</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap');
+
+  :root {
+    --bg: #0f1319;
+    --surface: #1a2029;
+    --surface-2: #222937;
+    --border: #2e3646;
+    --text-primary: #eef1f6;
+    --text-secondary: #9aa5b6;
+    --text-muted: #6b7688;
+    --accent: #5b9bff;
+    --accent-soft: rgba(91,155,255,0.12);
+    --amber: #f5b544;
+    --amber-soft: rgba(245,181,68,0.14);
+    --success: #4fd68f;
+    --success-soft: rgba(79,214,143,0.12);
+    --danger: #ff6b6b;
+    --danger-soft: rgba(255,107,107,0.14);
+    --radius: 16px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: radial-gradient(circle at 50% 0%, #171d27 0%, #0f1319 60%);
+    color: var(--text-primary);
+    font-family: 'Noto Sans KR', 'Manrope', sans-serif;
+    min-height: 100vh;
+    padding: 32px 16px 60px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .wrap { width: 100%; max-width: 560px; }
+
+  header { margin-bottom: 22px; }
+  .eyebrow {
+    font-family: 'Manrope', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+  h1 { font-size: 22px; font-weight: 800; margin: 0 0 6px; }
+  .subtitle { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+  .steps { display: flex; gap: 6px; margin: 20px 0; }
+  .step-pill { flex: 1; height: 5px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
+  .step-pill-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.4s ease; }
+  .step-pill.done .step-pill-fill { width: 100%; background: var(--success); }
+  .step-pill.active .step-pill-fill { width: 100%; }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .topic-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; }
+  .topic-card h2 { font-size: 15px; margin: 0 0 12px; color: var(--text-secondary); font-weight: 700; }
+  .situation-en { font-family: 'Manrope', sans-serif; font-size: 15px; line-height: 1.7; margin-bottom: 10px; }
+  .situation-kr { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+  .mic-box {
+    margin-top: 16px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+  .mic-status { font-weight: 700; margin-bottom: 6px; }
+  .mic-status.granted { color: var(--success); }
+  .mic-status.denied { color: var(--danger); }
+  .mic-status.pending { color: var(--amber); }
+
+  .start-btn, .action-btn {
+    width: 100%;
+    margin-top: 14px;
+    padding: 16px;
+    border-radius: 12px;
+    border: none;
+    background: var(--accent);
+    color: #0a0e14;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  .start-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .action-btn.secondary { background: var(--surface-2); color: var(--text-primary); border: 1px solid var(--border); }
+  .action-btn.danger { background: var(--danger-soft); color: var(--danger); border: 1px solid var(--danger); }
+  .btn-row { display: flex; gap: 10px; }
+  .btn-row .action-btn { flex: 1; }
+
+  .q-label { font-family: 'Manrope', sans-serif; font-size: 12px; font-weight: 800; letter-spacing: 0.08em; color: var(--accent); text-transform: uppercase; margin-bottom: 10px; }
+  .q-text { font-family: 'Manrope', sans-serif; font-size: 18px; font-weight: 600; line-height: 1.6; margin-bottom: 6px; }
+  .q-text-kr { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+
+  .phase-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px 22px; text-align: center; }
+
+  .phase-tag { display: inline-block; font-family: 'Manrope', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; padding: 5px 12px; border-radius: 20px; margin-bottom: 18px; }
+  .phase-tag.prep { background: var(--amber-soft); color: var(--amber); }
+  .phase-tag.answer { background: var(--accent-soft); color: var(--accent); }
+
+  .rec-dot { display:inline-block; width:8px; height:8px; border-radius:50%; background: var(--danger); margin-right:6px; animation: pulse 1s infinite; vertical-align:middle; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+  .timer-ring-wrap { position: relative; width: 160px; height: 160px; margin: 0 auto 18px; }
+  .timer-ring-wrap svg { transform: rotate(-90deg); }
+  .timer-ring-bg { fill: none; stroke: var(--surface-2); stroke-width: 8; }
+  .timer-ring-fg { fill: none; stroke: var(--accent); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+  .timer-number { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 44px; font-weight: 700; }
+
+  .phase-hint { font-size: 13px; color: var(--text-secondary); }
+  .live-transcript {
+    margin-top: 16px;
+    min-height: 44px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--text-primary);
+    text-align: left;
+    line-height: 1.6;
+  }
+  .live-transcript .placeholder { color: var(--text-muted); }
+
+  .review-block { margin-top: 14px; }
+  .review-label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display:flex; align-items:center; gap:6px; }
+  .review-text { background: var(--success-soft); border-radius: 10px; padding: 14px 16px; font-size: 14px; line-height: 1.7; color: var(--text-primary); }
+  .review-text.transcript-box { background: var(--surface-2); }
+  audio { width: 100%; margin-top: 6px; }
+
+  .done-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px 22px; text-align: center; }
+  .done-card .big { font-size: 40px; margin-bottom: 8px; }
+  .done-card p { color: var(--text-secondary); font-size: 14px; line-height: 1.6; }
+
+  .footer-note { margin-top: 28px; font-size: 12px; color: var(--text-muted); text-align: center; line-height: 1.6; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="index.html" style="display:inline-block; margin-bottom:14px; font-size:13px; color:var(--text-muted); text-decoration:none;">← 홈으로</a>
+  <header>
+    <div class="eyebrow">TOEIC Speaking · Timed Practice</div>
+    <h1>Questions 5-7 실전연습</h1>
+    <div class="subtitle">준비시간·답변시간에 맞춰 소리 내어 답변하고, 녹음 재생 + 자동 인식 텍스트를 내가 저장해둔 최종 답변과 비교하세요.</div>
+  </header>
+
+  <div class="steps" id="steps"></div>
+
+  <div class="screen active" id="screen-intro">
+    <div class="topic-card">
+      <h2 id="topic-title">[1] Hometown</h2>
+      <div class="situation-en" id="situation-en"></div>
+      <div class="situation-kr" id="situation-kr"></div>
+      <div class="mic-box">
+        <div class="mic-status pending" id="mic-status">마이크 연결 안 됨</div>
+        <div id="mic-desc">답변을 녹음하고 자동으로 텍스트로 인식하려면 마이크 권한이 필요해요. 녹음은 이 브라우저 탭 안에만 임시 저장되고, 음성 인식은 온라인 서비스(크롬 내장)를 사용해 인터넷 연결이 필요해요.</div>
+      </div>
+    </div>
+    <button class="start-btn" id="mic-btn">마이크 권한 허용하기</button>
+    <button class="start-btn" id="start-btn" disabled>연습 시작하기</button>
+  </div>
+
+  <div class="screen" id="screen-question">
+    <div class="q-label" id="q-label"></div>
+    <div class="q-text" id="q-text"></div>
+    <div class="q-text-kr" id="q-text-kr"></div>
+
+    <div class="phase-card">
+      <div class="phase-tag prep" id="phase-tag">준비 시간</div>
+      <div class="timer-ring-wrap">
+        <svg width="160" height="160">
+          <circle class="timer-ring-bg" cx="80" cy="80" r="70"></circle>
+          <circle class="timer-ring-fg" id="timer-ring-fg" cx="80" cy="80" r="70"></circle>
+        </svg>
+        <div class="timer-number" id="timer-number">3</div>
+      </div>
+      <div class="phase-hint" id="phase-hint">잠시 후 답변이 시작됩니다. 마음속으로 답변을 정리하세요.</div>
+      <div class="live-transcript" id="live-transcript" style="display:none;"><span class="placeholder">말하기를 시작하면 여기에 실시간으로 텍스트가 나타나요...</span></div>
+      <button class="action-btn danger" id="stop-early-btn" style="display:none;">지금 답변 종료하고 확인하기</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-review">
+    <div class="q-label" id="review-q-label"></div>
+    <div class="q-text" id="review-q-text"></div>
+
+    <div class="review-block">
+      <div class="review-label">🎧 내 녹음 듣기</div>
+      <audio controls id="review-audio"></audio>
+    </div>
+
+    <div class="review-block">
+      <div class="review-label">📝 자동 인식된 내 답변 (참고용, 완벽하지 않을 수 있어요)</div>
+      <div class="review-text transcript-box" id="review-transcript"></div>
+    </div>
+
+    <div class="review-block">
+      <div class="review-label">✅ 내가 저장해둔 최종 답변</div>
+      <div class="review-text" id="review-answer"></div>
+    </div>
+
+    <div class="btn-row" style="margin-top:18px;">
+      <button class="action-btn secondary" id="repeat-btn">이 문제 다시</button>
+      <button class="action-btn" id="continue-btn">다음으로</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-done">
+    <div class="done-card">
+      <div class="big">🎯</div>
+      <h2 style="margin:0 0 8px; font-size:18px;">이 세트 연습 완료!</h2>
+      <p>Q5, Q6, Q7 모두 실전 시간에 맞춰 연습하셨어요. 완성된 PDF를 주시면 모든 토픽 세트를 이 형식으로 이어서 만들어드릴게요.</p>
+    </div>
+    <button class="action-btn" id="restart-btn" style="margin-top:16px;">이 세트 처음부터 다시</button>
+  </div>
+
+  <div class="footer-note">현재 예시 데이터(고향 세트) 1개로 만들어져 있어요. 완성된 PDF를 보내주시면 모든 토픽을 담아 다시 만들어드립니다.<br>음성 인식은 Chrome 브라우저에서 가장 잘 작동해요.</div>
+</div>
+
+<script>
+const topics = [
+  {
+    title: "[1] Hometown",
+    situationEn: "Imagine that an Australian marketing firm is doing research in your country. You have agreed to participate in a telephone interview about your hometown.",
+    situationKr: "호주의 한 마케팅 회사가 당신의 나라에서 설문조사를 하고 있다고 가정해보세요. 당신은 고향에 관한 전화 인터뷰에 참여하기로 동의했습니다.",
+    questions: [
+      { label: "Question 5", prep: 3, answer: 15,
+        textEn: "What is the name of your hometown and do you still live there?",
+        textKr: "당신의 고향 이름은 무엇이고, 지금도 그곳에 살고 있나요?",
+        myAnswer: "The name of my hometown is Seoul. I still live there for work." },
+      { label: "Question 6", prep: 3, answer: 15,
+        textEn: "What activities do you enjoy in your hometown?",
+        textKr: "당신은 고향에서 어떤 활동들을 즐기나요?",
+        myAnswer: "I enjoy hiking in my hometown. And I usually do it with my family. Also, I enjoy fishing too." },
+      { label: "Question 7", prep: 3, answer: 30,
+        textEn: "Would you recommend your hometown to your friends for sightseeing? Why or why not?",
+        textKr: "당신은 친구들에게 관광을 위해 고향을 추천하겠습니까? 그 이유는 무엇인가요, 혹은 왜 추천하지 않겠습니까?",
+        myAnswer: "I would not recommend my hometown to my friends for sightseeing. Because it is inconvenient to use public transportation in my hometown. Also, there are no popular tourist attractions. So there is nothing to do there." }
+    ]
+  }
+];
+
+let currentTopic = topics[0];
+let currentQIndex = 0;
+let timerInterval = null;
+let mediaStream = null;
+let mediaRecorder = null;
+let audioChunks = [];
+let recognition = null;
+let liveTranscript = '';
+const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function renderSteps(){
+  const stepsDiv = document.getElementById('steps');
+  stepsDiv.innerHTML = '';
+  currentTopic.questions.forEach((q,i)=>{
+    const pill = document.createElement('div');
+    pill.className = 'step-pill';
+    if(i < currentQIndex) pill.classList.add('done');
+    else if(i === currentQIndex) pill.classList.add('active');
+    pill.innerHTML = '<div class="step-pill-fill"></div>';
+    stepsDiv.appendChild(pill);
+  });
+}
+
+function initIntro(){
+  document.getElementById('topic-title').textContent = currentTopic.title;
+  document.getElementById('situation-en').textContent = currentTopic.situationEn;
+  document.getElementById('situation-kr').textContent = '(' + currentTopic.situationKr + ')';
+  currentQIndex = 0;
+  renderSteps();
+  showScreen('screen-intro');
+}
+
+document.getElementById('mic-btn').addEventListener('click', async ()=>{
+  const statusEl = document.getElementById('mic-status');
+  const descEl = document.getElementById('mic-desc');
+  statusEl.textContent = '권한 요청 중...';
+  statusEl.className = 'mic-status pending';
+  try {
+    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    statusEl.textContent = '✓ 마이크 연결됨';
+    statusEl.className = 'mic-status granted';
+    descEl.textContent = '이제 연습을 시작할 수 있어요.';
+    document.getElementById('start-btn').disabled = false;
+    document.getElementById('mic-btn').style.display = 'none';
+    if(!SpeechRecognitionCtor){
+      descEl.textContent += ' (이 브라우저는 자동 음성 인식은 지원하지 않아요. 녹음/재생은 정상 작동합니다.)';
+    }
+  } catch(err) {
+    statusEl.textContent = '✗ 마이크 권한이 거부되었어요';
+    statusEl.className = 'mic-status denied';
+    descEl.textContent = '브라우저 주소창 왼쪽의 자물쇠 아이콘에서 마이크 권한을 허용한 뒤 다시 시도해주세요.';
+  }
+});
+
+document.getElementById('start-btn').addEventListener('click', startQuestion);
+
+const CIRC = 2 * Math.PI * 70;
+document.getElementById('timer-ring-fg').style.strokeDasharray = CIRC;
+
+function startRecording(){
+  audioChunks = [];
+  try {
+    mediaRecorder = new MediaRecorder(mediaStream);
+    mediaRecorder.ondataavailable = e => { if(e.data.size > 0) audioChunks.push(e.data); };
+    mediaRecorder.start();
+  } catch(err){ console.log('recording not available', err); }
+}
+
+function stopRecording(callback){
+  if(!mediaRecorder){ callback(null); return; }
+  mediaRecorder.onstop = () => {
+    const blob = new Blob(audioChunks, { type: 'audio/webm' });
+    const url = URL.createObjectURL(blob);
+    callback(url);
+  };
+  try { mediaRecorder.stop(); } catch(err){ callback(null); }
+}
+
+function startRecognition(){
+  liveTranscript = '';
+  const box = document.getElementById('live-transcript');
+  if(!SpeechRecognitionCtor){ box.style.display='none'; return; }
+  box.style.display = 'block';
+  box.innerHTML = '<span class="placeholder">말하기를 시작하면 여기에 실시간으로 텍스트가 나타나요...</span>';
+  recognition = new SpeechRecognitionCtor();
+  recognition.lang = 'en-US';
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.onresult = (event) => {
+    let text = '';
+    for(let i=0;i<event.results.length;i++){ text += event.results[i][0].transcript; }
+    liveTranscript = text;
+    box.textContent = text || '...';
+  };
+  recognition.onerror = (e) => { console.log('speech recognition error', e.error); };
+  try { recognition.start(); } catch(err){ console.log(err); }
+}
+
+function stopRecognition(){
+  if(recognition){ try{ recognition.stop(); }catch(err){} }
+}
+
+function runPhase(seconds, isPrep, onDone){
+  const tag = document.getElementById('phase-tag');
+  const hint = document.getElementById('phase-hint');
+  const ring = document.getElementById('timer-ring-fg');
+  const numberEl = document.getElementById('timer-number');
+  const stopEarlyBtn = document.getElementById('stop-early-btn');
+
+  tag.innerHTML = isPrep ? '준비 시간' : '<span class="rec-dot"></span>답변 시간 — 소리 내어 말하세요';
+  tag.className = 'phase-tag ' + (isPrep ? 'prep' : 'answer');
+  ring.style.stroke = isPrep ? 'var(--amber)' : 'var(--accent)';
+  hint.textContent = isPrep ? '잠시 후 답변이 시작됩니다. 마음속으로 답변을 정리하세요.' : '지금부터 실제로 소리 내어 답변해보세요.';
+  stopEarlyBtn.style.display = isPrep ? 'none' : 'block';
+
+  if(!isPrep){
+    startRecording();
+    startRecognition();
+  }
+
+  let remaining = seconds;
+  numberEl.textContent = remaining;
+  ring.style.strokeDashoffset = 0;
+
+  clearInterval(timerInterval);
+  timerInterval = setInterval(()=>{
+    remaining--;
+    numberEl.textContent = Math.max(remaining,0);
+    const progress = (seconds - remaining) / seconds;
+    ring.style.strokeDashoffset = CIRC * progress;
+    if(remaining <= 0){
+      clearInterval(timerInterval);
+      onDone();
+    }
+  }, 1000);
+}
+
+function finishAnswerPhase(){
+  clearInterval(timerInterval);
+  document.getElementById('stop-early-btn').style.display = 'none';
+  stopRecognition();
+  stopRecording((url)=>{
+    const q = currentTopic.questions[currentQIndex];
+    q._recordedUrl = url;
+    q._transcript = liveTranscript;
+    showReview();
+  });
+}
+
+document.getElementById('stop-early-btn').addEventListener('click', finishAnswerPhase);
+
+function startQuestion(){
+  const q = currentTopic.questions[currentQIndex];
+  document.getElementById('q-label').textContent = q.label + ' · 준비 ' + q.prep + '초 / 답변 ' + q.answer + '초';
+  document.getElementById('q-text').textContent = q.textEn;
+  document.getElementById('q-text-kr').textContent = '(' + q.textKr + ')';
+  renderSteps();
+  showScreen('screen-question');
+
+  runPhase(q.prep, true, ()=>{
+    runPhase(q.answer, false, ()=>{
+      finishAnswerPhase();
+    });
+  });
+}
+
+function showReview(){
+  const q = currentTopic.questions[currentQIndex];
+  document.getElementById('review-q-label').textContent = q.label;
+  document.getElementById('review-q-text').textContent = q.textEn;
+  document.getElementById('review-answer').textContent = q.myAnswer;
+
+  const audioEl = document.getElementById('review-audio');
+  if(q._recordedUrl){ audioEl.src = q._recordedUrl; audioEl.style.display='block'; }
+  else { audioEl.style.display='none'; }
+
+  const transcriptEl = document.getElementById('review-transcript');
+  transcriptEl.textContent = q._transcript && q._transcript.trim() ? q._transcript : '(인식된 텍스트가 없어요. 이 브라우저가 음성 인식을 지원하지 않거나 소리가 너무 작았을 수 있어요.)';
+
+  showScreen('screen-review');
+}
+
+document.getElementById('repeat-btn').addEventListener('click', startQuestion);
+
+document.getElementById('continue-btn').addEventListener('click', ()=>{
+  currentQIndex++;
+  if(currentQIndex >= currentTopic.questions.length){
+    showScreen('screen-done');
+  } else {
+    startQuestion();
+  }
+});
+
+document.getElementById('restart-btn').addEventListener('click', initIntro);
+
+initIntro();
+</script>
+</body>
+</html>
