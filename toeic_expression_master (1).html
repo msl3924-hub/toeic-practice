@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>토익스피킹 표현 마스터</title>
+<style>
+  :root{
+    --ink:#12181f;
+    --panel:#1a232e;
+    --panel2:#212c39;
+    --line:#2c3948;
+    --paper:#eef1f4;
+    --amber:#ffb703;
+    --amber-dim:#8a6a1f;
+    --teal:#2dd4bf;
+    --red:#ff6b6b;
+    --muted:#8ca0b3;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--paper);
+    font-family:-apple-system,"Apple SD Gothic Neo","Malgun Gothic",Helvetica,Arial,sans-serif;
+    min-height:100vh;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:22px 16px 60px;}
+
+  .brand{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px;}
+  .brand h1{
+    font-size:20px;letter-spacing:.02em;margin:0;font-weight:800;
+    font-family:Georgia,"Times New Roman",serif;
+  }
+  .brand h1 span{color:var(--amber);}
+  .brand .sub{font-size:11px;color:var(--muted);}
+
+  .statbar{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0 18px;
+  }
+  .stat{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:10px 8px;text-align:center;
+  }
+  .stat b{display:block;font-size:19px;color:var(--teal);font-variant-numeric:tabular-nums;}
+  .stat span{font-size:10.5px;color:var(--muted);}
+
+  .catbox{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:12px;margin-bottom:14px;
+  }
+  .catbox .grouplabel{font-size:11px;color:var(--muted);margin:8px 0 6px;letter-spacing:.04em;}
+  .grouplabel:first-child{margin-top:0;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{
+    border:1px solid var(--line);background:var(--panel2);color:var(--paper);
+    padding:6px 10px;border-radius:999px;font-size:12.5px;cursor:pointer;user-select:none;
+    transition:.15s;
+  }
+  .chip.active{background:var(--amber);color:#1a1200;border-color:var(--amber);font-weight:700;}
+  .chip small{opacity:.65;margin-left:3px;}
+
+  .modebar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+  .modebtn{
+    flex:1;min-width:110px;background:var(--panel);border:1px solid var(--line);color:var(--paper);
+    padding:9px;border-radius:9px;font-size:12.5px;cursor:pointer;
+  }
+  .modebtn.active{background:var(--teal);color:#062824;font-weight:700;border-color:var(--teal);}
+
+  .card{
+    background:linear-gradient(180deg,var(--panel2),var(--panel));
+    border:1px solid var(--line);border-radius:16px;padding:26px 22px;
+    min-height:230px;display:flex;flex-direction:column;justify-content:space-between;
+    position:relative;overflow:hidden;
+  }
+  .card::before{
+    content:attr(data-idx);
+    position:absolute;top:14px;right:18px;font-size:11px;color:var(--muted);
+    font-variant-numeric:tabular-nums;
+  }
+  .tag{
+    display:inline-block;font-size:11px;color:var(--amber);border:1px solid var(--amber-dim);
+    padding:2px 8px;border-radius:6px;margin-bottom:12px;letter-spacing:.03em;
+  }
+  .kr{font-size:21px;line-height:1.55;font-weight:600;margin-bottom:18px;}
+  .prompt{font-size:12px;color:var(--muted);margin-bottom:10px;}
+  .inputRow{display:flex;gap:8px;margin-bottom:10px;align-items:stretch;}
+  .answerBox{
+    flex:1;width:100%;background:#0d1319;border:1px solid var(--line);border-radius:10px;
+    color:var(--paper);font-size:15.5px;padding:11px 12px;
+    font-family:Georgia,"Times New Roman",serif;
+  }
+  .answerBox:focus{outline:2px solid var(--teal);}
+  .micBtn{
+    flex:0 0 48px;background:#0d1319;border:1px solid var(--line);border-radius:10px;
+    color:var(--paper);font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    transition:.15s;position:relative;
+  }
+  .micBtn:hover{border-color:var(--teal);}
+  .micBtn.recording{
+    background:var(--red);border-color:var(--red);color:#2a0505;
+    animation:pulse 1.1s infinite;
+  }
+  .micBtn.unsupported{opacity:.35;cursor:not-allowed;}
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(255,107,107,.55);}
+    70%{box-shadow:0 0 0 9px rgba(255,107,107,0);}
+    100%{box-shadow:0 0 0 0 rgba(255,107,107,0);}
+  }
+  .micStatus{font-size:11.5px;color:var(--muted);margin:-4px 0 10px;min-height:14px;}
+  .micStatus.live{color:var(--teal);}
+  .revealArea{
+    background:#0d1319;border:1px dashed var(--line);border-radius:10px;
+    padding:12px 13px;font-size:16px;line-height:1.5;font-family:Georgia,serif;
+    margin-bottom:8px;display:none;
+  }
+  .revealArea.show{display:block;}
+  .diffline{font-size:12.5px;color:var(--muted);margin-top:6px;font-family:-apple-system,sans-serif;}
+  .ok{color:var(--teal);}
+  .bad{color:var(--red);}
+
+  .rowbtns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+  .btn{
+    flex:1;min-width:90px;padding:10px 8px;border-radius:10px;border:none;
+    font-size:13px;font-weight:700;cursor:pointer;
+  }
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--paper);}
+  .btn.reveal{background:var(--amber);color:#1a1200;}
+  .btn.know{background:var(--teal);color:#062824;}
+  .btn.unsure{background:#3a4553;color:var(--paper);}
+  .btn.dontknow{background:var(--red);color:#2a0505;}
+
+  .navrow{display:flex;justify-content:space-between;align-items:center;margin-top:14px;}
+  .navbtn{background:var(--panel);border:1px solid var(--line);color:var(--paper);
+    padding:9px 16px;border-radius:9px;cursor:pointer;font-size:13px;}
+  .progresswrap{flex:1;margin:0 12px;height:6px;background:var(--panel);border-radius:6px;overflow:hidden;}
+  .progressfill{height:100%;background:var(--teal);width:0%;transition:.2s;}
+
+  .foot{font-size:11px;color:var(--muted);text-align:center;margin-top:20px;line-height:1.6;}
+  .resetlink{color:var(--muted);text-decoration:underline;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand">
+    <h1>토익스피킹 <span>표현 마스터</span></h1>
+  </div>
+  <div class="sub">5개 PDF · 핵심구문 · 빈출주제 · 기초편 전체 표현 · 총 <span id="totalCountLabel">0</span>개 문장</div>
+
+  <div class="statbar">
+    <div class="stat"><b id="statTotal">0</b><span>전체 문장</span></div>
+    <div class="stat"><b id="statMastered">0</b><span>완전 암기</span></div>
+    <div class="stat"><b id="statLearning">0</b><span>학습중</span></div>
+    <div class="stat"><b id="statNew">0</b><span>미학습</span></div>
+  </div>
+
+  <div class="catbox" id="catbox"></div>
+
+  <div class="modebar">
+    <button class="modebtn active" data-mode="all">전체 문장</button>
+    <button class="modebtn" data-mode="weak">오답·미학습만</button>
+    <button class="modebtn" data-mode="mastered">완전암기 복습</button>
+  </div>
+
+  <div class="card" id="card" data-idx="">
+    <div>
+      <div class="tag" id="cardTag">-</div>
+      <div class="prompt">이 문장을 영어로 말해보세요 (소리 내어 말한 뒤 타이핑으로 확인하세요)</div>
+      <div class="kr" id="krText">불러오는 중...</div>
+      <div class="inputRow">
+        <input class="answerBox" id="answerInput" placeholder="영어로 말하거나 타이핑해보세요" autocomplete="off">
+        <button class="micBtn" id="micBtn" title="마이크로 녹음 시작">🎤</button>
+      </div>
+      <div class="micStatus" id="micStatus"></div>
+      <div class="revealArea" id="revealArea"></div>
+      <div class="diffline" id="diffLine"></div>
+    </div>
+    <div>
+      <div class="rowbtns" id="preRevealBtns">
+        <button class="btn reveal" id="revealBtn">정답 확인</button>
+      </div>
+      <div class="rowbtns" id="postRevealBtns" style="display:none;">
+        <button class="btn dontknow" data-rate="0">몰랐어요</button>
+        <button class="btn unsure" data-rate="1">헷갈렸어요</button>
+        <button class="btn know" data-rate="2">알고있었어요</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="navrow">
+    <button class="navbtn" id="prevBtn">← 이전</button>
+    <div class="progresswrap"><div class="progressfill" id="progressFill"></div></div>
+    <button class="navbtn" id="shuffleBtn">🔀 섞기</button>
+  </div>
+
+  <div class="foot">
+    진행 상황은 자동 저장됩니다 (이 기기/브라우저 기준) · <span class="resetlink" id="resetLink">전체 기록 초기화</span>
+  </div>
+
+</div>
+
+<script>
+/* ================= DATA ================= */
+const DATA = {
+"can": {title:"can + V", group:"핵심구문편", items:[
+["저는 책에 필기를 할 수 있습니다.","I can take notes in a book."],
+["저는 목적지에 빨리 도착할 수 있습니다.","I can get to my destination quickly."],
+["저는 직접 옷을 입어볼 수 있습니다.","I can try on clothes in person."],
+["저는 적은 비용으로 여행할 수 있습니다.","I can travel at a low cost."],
+["저는 스마트폰으로 쇼핑을 할 수 있습니다.","I can shop on my smartphone."],
+["저는 다양한 브랜드를 비교할 수 있습니다.","I can compare various brands."],
+["저는 요리에 드는 시간을 절약할 수 있습니다.","I can save time on cooking."],
+["저는 늦은 밤에도 운동할 수 있습니다.","I can exercise late at night."],
+["저는 돈을 낭비하는 것을 피할 수 있습니다.","I can avoid wasting money."],
+["저는 일을 제시간에 끝낼 수 있습니다.","I can finish work in time."],
+["저는 무료로 책을 읽을 수 있습니다.","I can read books for free."],
+["저는 취향에 맞는 책을 고를 수 있습니다.","I can choose books that suit my taste."],
+["우리는 트레이너에게 도움을 받을 수 있습니다.","We can get help from a trainer."],
+["우리는 직장에서 인간관계를 넓힐 수 있습니다.","We can expand our social network at work."],
+["우리는 아름다운 야경을 즐길 수 있습니다.","We can enjoy a beautiful night view."],
+["우리는 시간과 장소에 상관없이 쇼핑할 수 있습니다.","We can shop regardless of time and place."],
+["우리는 조용한 분위기에서 책을 읽을 수 있습니다.","We can read books in a quiet atmosphere."],
+["우리는 인턴십 동안 실용적인 기술을 배울 수 있습니다.","We can learn practical skills during internships."],
+["우리는 편안한 환경에서 일할 수 있습니다.","We can work in a comfortable environment."],
+["우리는 음악을 더 편리하게 구매할 수 있습니다.","We can buy music more conveniently."],
+["우리는 운동 영상을 여러 번 볼 수 있습니다.","We can watch exercise videos multiple times."],
+["우리는 이메일을 반복해서 확인할 수 있습니다.","We can check emails repeatedly."],
+["우리는 직장에서 실수를 줄일 수 있습니다.","We can reduce mistakes at work."],
+["우리는 다양한 업무를 경험할 수 있습니다.","We can experience a variety of tasks."],
+["우리는 업무에 빠르게 적응할 수 있습니다.","We can adapt to our work quickly."],
+["우리는 재정적으로 안정된 삶을 살 수 있습니다.","We can have a financially stable life."],
+["우리는 다양한 현지 음식을 즐길 수 있습니다.","We can enjoy various local foods."],
+["그들은 다른 학생들로부터 동기부여를 받을 수 있습니다.","They can be motivated by other students."],
+["그들은 더 나은 수준의 교육을 받을 수 있습니다.","They can have a higher quality of education."],
+["그들은 좋은 공부 습관을 기를 수 있습니다.","They can develop good study habits."],
+["그들은 스마트폰으로 인해 산만해질 수 있습니다.","They can be distracted by their smartphones."],
+["학생들은 학교에서 많은 친구를 사귈 수 있습니다.","Students can make many friends at school."],
+["학생들은 공부에 쉽게 집중할 수 있습니다.","Students can focus on their studies easily."],
+["학생들이 자신의 적성을 발견할 수 있습니다.","Students can find their aptitude."],
+["학생들은 다양한 사회성을 배울 수 있습니다.","Students can learn various social skills."],
+["학생들은 공부로 인한 스트레스를 해소할 수 있습니다.","Students can relieve stress from studies."]
+]},
+"itis": {title:"It is + 형용사 + to V", group:"핵심구문편", items:[
+["출퇴근(또는 통학)하는 것이 불편했습니다.","It was inconvenient to commute."],
+["다양한 브랜드를 비교하기 편리합니다.","It is convenient to compare various brands."],
+["규칙적으로 운동하는 것이 중요합니다.","It is important to exercise regularly."],
+["집에서는 공부에 집중하기 어렵습니다.","It is difficult to focus on studying at home."],
+["대도시에서는 취업 정보를 얻기가 쉽습니다.","It is easy to get job information in a big city."],
+["요즘 사업을 운영하는 것은 경쟁이 심합니다.","It is competitive to run a business nowadays."],
+["쇼핑 리스트를 작성해 두는 것은 유용합니다.","It is useful to make a shopping list."],
+["혼자 캠핑을 가는 것은 위험합니다.","It is dangerous to go camping alone."],
+["호텔 레스토랑에서 식사하는 것은 비쌉니다.","It is expensive to eat at a hotel restaurant."],
+["한국에서 대중교통을 이용하는 것은 저렴합니다.","It is cheap to use public transportation in Korea."],
+["친구들과 함께 쇼핑하는 것이 더 즐겁습니다.","It is more fun to shop with my friends."],
+["낯선 사람과 일하는 것은 불편합니다.","It is uncomfortable to work with strangers."],
+["투자에 대해 배우는 것은 도움이 됩니다.","It is helpful to learn about investing."]
+]},
+"there": {title:"There is/are + 명사", group:"핵심구문편", items:[
+["제 고향에는 유명한 랜드마크가 없습니다.","There is no famous landmark in my hometown."],
+["요즘에는 학습을 위한 스마트폰 앱이 많습니다.","There are many smartphone apps for learning."],
+["백화점에는 많은 명품 브랜드가 있습니다.","There are many luxury brands in department stores."],
+["헬스장에는 많은 종류의 운동 기구가 있습니다.","There are many kinds of exercise equipment in fitness centers."],
+["유튜브에는 운동 영상이 많습니다.","There are many exercise videos on YouTube."],
+["거리에 차가 너무 많습니다.","There are too many cars on the street."],
+["집에는 집중을 방해하는 요소가 너무 많습니다.","There are too many distractions at home."],
+["우리 도시에는 자전거를 타는 사람이 많지 않습니다.","There are not many bicycle riders in my city."]
+]},
+"needto": {title:"need to (should) + V", group:"핵심구문편", items:[
+["저는 더 건강한 식습관을 가져야 합니다.","I need to have healthier eating habits."],
+["저는 계속 외국어를 공부해야 합니다.","I need to keep studying foreign languages."],
+["저는 스마트폰을 덜 사용해야 합니다.","I need to use my smartphone less."],
+["저는 일찍 자야 합니다.","I need to go to bed early."],
+["우리는 종이와 플라스틱을 재활용해야 합니다.","We should recycle paper and plastic."],
+["우리는 직장에 늦지 말아야 합니다.","We should not be late for work."],
+["우리는 규칙적으로 운동해야 합니다.","We should exercise regularly."],
+["우리는 대중교통을 더 자주 이용해야 합니다.","We should take public transportation more often."]
+]},
+"donthave": {title:"don't have to + V", group:"핵심구문편", items:[
+["우리는 여행 중에 서두르지 않아도 됩니다.","We don't have to hurry while traveling."],
+["우리는 쇼핑을 하기 위해 돌아다니지 않아도 됩니다.","We don't have to walk around to go shopping."],
+["우리는 통근에 시간을 낭비하지 않아도 됩니다.","We don't have to waste time commuting."],
+["저는 층간 소음을 걱정할 필요가 없습니다.","I don't have to worry about noise between floors."],
+["저는 은행에 직접 가지 않아도 됩니다.","I don't have to go to a bank in person."],
+["저는 환승을 하지 않아도 됩니다.","I don't have to transfer."],
+["저는 주말에 일을 하지 않아도 됩니다.","I don't have to work on weekends."],
+["저는 영화를 선택하기 위해 다른 사람과 상의하지 않아도 됩니다.","I don't have to discuss with anyone to select a movie."],
+["저는 식사 후에 설거지를 할 필요가 없습니다.","I don't have to do the dishes after having a meal."],
+["저는 교통비에 많은 돈을 쓰지 않아도 됩니다.","I don't have to spend a lot of money on transportation costs."],
+["저는 비싼 운동 장비를 구매할 필요가 없습니다.","I don't have to buy expensive exercise equipment."]
+]},
+"interested": {title:"be + interested in", group:"핵심구문편", items:[
+["저는 새로운 문화를 경험하는 데 관심이 있습니다.","I'm interested in experiencing new cultures."],
+["저는 악기 연주에 관심이 있습니다.","I'm interested in playing musical instruments."],
+["저는 인테리어 디자인에 관심이 많습니다.","I'm very interested in interior design."],
+["저는 캠핑에 관심이 없습니다.","I'm not interested in camping."],
+["저는 요리에 전혀 관심이 없습니다.","I'm not interested in cooking at all."],
+["저는 역사에 관심이 없었습니다.","I was not interested in history."],
+["저는 스타트업 회사에 별로 관심이 없었습니다.","I was not very interested in startups."]
+]},
+"like": {title:"like + 동명사", group:"핵심구문편", items:[
+["저는 책에 메모하는 것을 좋아합니다.","I like taking notes in books."],
+["저는 강을 따라 걷는 것을 좋아합니다.","I like walking along the river."],
+["저는 아침으로 빵을 먹는 것을 좋아합니다.","I like having bread for breakfast."],
+["저는 혼자 여행하는 것을 좋아합니다.","I like traveling alone."],
+["저는 일하면서 음악을 듣는 것을 좋아합니다.","I like listening to music while working."],
+["저는 집에서 요리하는 것을 좋아하지 않습니다.","I don't like cooking at home."],
+["저는 매운 음식을 먹는 것을 좋아하지 않습니다.","I don't like eating spicy food."],
+["저는 아침에 공부하는 것을 좋아하지 않습니다.","I don't like studying in the morning."]
+]},
+"work": {title:"work", group:"빈출주제편 ①", items:[
+["저는 1년간 구직 활동을 했습니다.","I looked for a job for a year.","look for a job (구직 활동을 하다)"],
+["대부분의 구직자들은 대기업을 선호합니다.","Most job seekers prefer large companies.","job seeker (구직자)"],
+["저는 혼자서 취업 면접을 준비했습니다.","I prepared for a job interview alone.","prepare for a job interview"],
+["그는 쉽게 취업을 했습니다.","He got a job easily.","get a job (취업하다)"],
+["그녀는 교육 회사에 들어갔습니다.","She entered an education company.","enter A (A에 입사하다)"],
+["그녀는 온라인 쇼핑몰을 차렸습니다.","She started an online shopping mall.","start A (A를 창업하다)"],
+["그녀는 거의 매일 야근을 했습니다.","She worked overtime almost every day.","work overtime (야근을 하다)"],
+["그녀는 팀 매니저로 승진했습니다.","She got promoted to the team manager.","get promoted (승진하다)"],
+["그는 해고되었습니다.","He got fired.","get fired (해고되다)"],
+["그녀는 지난 달에 퇴사했습니다.","She quit the job last month.","quit the job (퇴사하다)"],
+["저는 주로 지하철로 출근합니다.","I usually go to work by subway.","go to work (출근하다)"],
+["그는 업무 중에 자주 실수를 했습니다.","He often made mistakes while working.","make a mistake (실수를 하다)"],
+["우리는 고객들로부터 많은 컴플레인을 받았습니다.","We received many complaints from customers.","receive a complaint (컴플레인을 받다)"],
+["그는 혼자서 여러 업무를 했습니다.","He did various tasks alone.","do a task (업무를 하다)"],
+["저는 회사에 자주 지각했습니다.","I was late for work often.","be late for work (회사에 지각하다)"],
+["그는 작년에 이직했습니다.","He changed jobs last year.","change jobs (이직하다)"],
+["저는 스타트업 회사에서 인턴 근무를 했습니다.","I interned at a start-up company.","intern at A (A에서 인턴 근무를 하다)"],
+["대기업에는 다양한 직원 혜택이 있습니다.","Large companies have various employee benefits.","employee benefits (직원 혜택)"],
+["그녀는 높은 월급을 받았습니다.","She received a high salary.","receive a salary (월급을 받다)"],
+["매출이 많이 늘었습니다.","The sales increased a lot.","sales increase/decrease (매출이 늘다/줄다)"],
+["저는 자주 출장을 갔습니다.","I often went on business trips.","go on a business trip (출장을 가다)"],
+["그는 런던으로 휴가를 갔습니다.","He went on a vacation to London.","go on a vacation (휴가를 가다)"],
+["저는 점심시간에 산책을 합니다.","I take a walk during lunch break.","lunch break (점심시간)"],
+["저의 근무 시간은 매우 길었습니다.","My working hours were very long.","working hours (근무 시간)"],
+["우리는 제 시간에 프로젝트를 마쳤습니다.","We finished the project in time.","finish A in time (A를 제 시간에 마치다)"],
+["우리는 마감기한을 지키지 못했습니다.","We couldn't meet the deadline.","meet the deadline (마감기한을 지키다)"],
+["저는 매일 아침 화상 통화를 했습니다.","I had a video call every morning.","have a video call (화상 통화를 하다)"],
+["우리는 직장에서 인간관계를 넓힐 수 있습니다.","We can expand our social network at work.","expand social network (인간관계를 넓히다)"],
+["그녀는 훌륭한 인사 평가를 받았습니다.","She received an excellent performance evaluation.","performance evaluation (인사 평가)"],
+["우리 회사는 경력직 사원 두 명을 채용했습니다.","Our company hired two experienced employees.","experienced employee (경력직 사원)"],
+["우리 회사는 유연근무제를 도입했습니다.","Our company introduced a flexible work system.","flexible work system (유연근무제)"]
+]},
+"school": {title:"school", group:"빈출주제편 ①", items:[
+["공부에 집중하기가 어려웠습니다.","It was hard to focus on my studies.","focus on studies (공부에 집중하다)"],
+["저는 시험 전에 많은 스트레스를 받았습니다.","I was under a lot of stress before exams.","under stress (스트레스를 받다)"],
+["학생들은 공부로 인한 스트레스를 해소할 수 있습니다.","Students can relieve stress from studies.","relieve stress (스트레스를 해소하다)"],
+["그들은 다른 학생들로부터 동기부여를 받을 수 있습니다.","They can be motivated by other students.","be motivated by A"],
+["저는 공부에 흥미를 잃었습니다.","I lost interest in studying.","lose interest (흥미를 잃다)"],
+["어린 아이들은 자제력이 부족합니다.","Young children lack self-control.","self-control (자제력)"],
+["저는 수업 중에 피드백을 자주 받았습니다.","I often received feedback in class.","receive feedback (피드백을 받다)"],
+["저는 집에서 온라인 수업을 들었습니다.","I took an online class at home.","take a class/lecture (수업을 듣다)"],
+["저는 박물관으로 현장 학습을 갔습니다.","I went on a field trip to a museum.","go on a field trip (현장 학습을 가다)"],
+["저는 고등학생 때 많은 친구들을 사귈 수 있었습니다.","I was able to make many friends in high school.","make friends (친구들을 사귀다)"],
+["그는 대부분의 학생들과 잘 지냈습니다.","He got along well with most of the students.","get along with A (A와 잘 지내다)"],
+["저는 다른 학생들과 협력하는 방법을 배웠습니다.","I learned how to cooperate with other students.","learn how to V"],
+["학생들은 환경의 중요성을 배울 필요가 있습니다.","Students need to learn the importance of the environment.","learn the importance of A"],
+["학생들은 학교에서 대인관계 기술을 배울 수 있습니다.","Students can learn interpersonal skills at school.","interpersonal skills (대인관계 기술)"],
+["그녀는 수학 실력을 빠르게 향상시켰습니다.","She improved her math skills quickly.","improve skills (실력을 향상시키다)"],
+["학생들은 더 나은 교육을 받을 수 있습니다.","Students can get a better education.","get an education (교육을 받다)"],
+["전자 기기는 학생들이 공부하는 것을 방해할 수 있습니다.","Electronic devices can distract students from studying.","distract A from -ing"],
+["그들은 좋은 공부 습관들을 기를 수 있습니다.","They can develop good study habits.","develop a habit (습관을 기르다)"],
+["학생들이 자신의 적성을 발견할 수 있습니다.","Students can find their aptitude.","find an aptitude (적성을 발견하다)"],
+["그 수업은 학생들이 진로를 선택하는 데 도움이 되었습니다.","The class helped students choose a career path.","choose a career path (진로를 선택하다)"],
+["그는 쉽게 시험에 합격했습니다.","He passed the exam easily.","pass/fail the exam"],
+["저는 고등학교 때 교복을 입었습니다.","I wore a school uniform in high school.","school uniform (교복)"],
+["저는 매일 입시 학원에서 공부했습니다.","I studied at a cram school every day.","cram school (입시 학원)"],
+["저는 아이패드에 필기를 했습니다.","I took notes on my iPad.","take notes (필기를 하다)"],
+["저는 일주일에 한 번 봉사활동을 했습니다.","I did volunteer work once a week.","do volunteer work (봉사활동을 하다)"],
+["저는 좋은 대학에 들어갈 수 있었습니다.","I could get into a good university.","get into a university (대학에 들어가다)"],
+["그녀는 회계학을 전공했습니다.","She majored in accounting.","major in A (A를 전공하다)"],
+["저는 학교에 버스로 통학했습니다.","I commuted to university by bus.","commute to A (A로 통학하다)"],
+["저는 과제가 많았습니다.","I had a lot of assignments.","assignment (과제)"],
+["대학교 등록금이 비쌌습니다.","The university tuition fee was expensive.","tuition fee (학비)"],
+["저는 기말고사에서 좋은 성적을 받았습니다.","I got good grades on the final exam.","get good/poor grades"],
+["성적이 많이 떨어졌습니다.","My grades decreased a lot.","grades increase/decrease"],
+["그는 전액 장학금을 받았습니다.","He received a full-time scholarship.","scholarship (장학금)"],
+["저는 학기 동안 아르바이트를 했습니다.","I worked part-time during the semesters.","work part-time (아르바이트를 하다)"],
+["저는 농구 동아리에 가입했습니다.","I joined a basketball club.","join a club (동아리에 가입하다)"],
+["그는 영국에서 유학을 했습니다.","He studied abroad in England.","study abroad (해외에서 공부하다)"],
+["저는 외국어 학원에 등록했습니다.","I registered for a language school.","register for A (A에 등록하다)"],
+["그녀는 다양한 자격증을 땄습니다.","She earned various certificates.","earn a certificate (자격증을 따다)"]
+]},
+"technology": {title:"technology", group:"빈출주제편 ①", items:[
+["우리는 언제 어디서나 정보를 검색할 수 있습니다.","We can search for information anytime, anywhere.","anytime, anywhere (언제 어디서나)"],
+["우리는 장소에 상관없이 온라인 쇼핑을 할 수 있습니다.","We can shop online regardless of location.","regardless of A (A에 상관없이)"],
+["저는 스마트폰으로 호텔을 예약했습니다.","I booked a hotel on my smartphone.","on our smartphones (스마트폰으로)"],
+["저는 스마트폰을 사용해서 은행 업무를 봅니다.","I do banking using my smartphone.","using our smartphones"],
+["우리는 매장에서 스마트폰으로 결제할 수 있습니다.","We can pay with a smartphone at stores.","pay with a smartphone"],
+["우리는 최신 기술을 사용함으로써 시간을 절약할 수 있습니다.","We can save time by using the latest technology.","save time (시간을 절약하다)"],
+["우리는 실시간으로 교통정보를 확인할 수 있습니다.","We can check traffic information in real time.","in real time (실시간으로)"],
+["저는 미리 좌석을 예약할 수 있었습니다.","I was able to reserve a seat in advance.","in advance (미리, 사전에)"],
+["저는 쉬는 시간에 인터넷을 검색합니다.","I browse the internet during my break.","browse the internet (인터넷을 검색하다)"],
+["우리 회사에서는 직원들이 정기적으로 재택근무를 합니다.","In our company, employees work from home regularly.","work from home (재택 근무하다)"],
+["많은 학생들이 효율적으로 공부하기 위해 AI 프로그램을 사용합니다.","Many students use AI programs to study efficiently.","AI program (인공지능 프로그램)"],
+["학생들은 라이브 온라인 수업에서 질문할 수 있습니다.","Students can ask questions in live online classes.","live online class (라이브 온라인 수업)"],
+["스마트 기기는 삶의 질을 높일 수 있습니다.","Smart devices can improve the quality of life.","improve the quality of life"],
+["인공지능이 인간을 빠르게 대체하고 있습니다.","AI is replacing humans quickly.","replace A (A를 대체하다)"],
+["많은 기업들이 제품을 홍보하기 위해 소셜 미디어를 사용합니다.","Many businesses use social media to promote products.","use social media (소셜 미디어를 사용하다)"],
+["요즘은 전기차 충전소를 찾기가 쉽습니다.","It is easy to find charging stations for electric cars these days.","electric cars (전기자동차)"]
+]},
+"shopping": {title:"shopping", group:"빈출주제편 ②", items:[
+["저는 20% 할인을 받았습니다.","I got a 20% discount.","get a discount (할인을 받다)"],
+["그들은 더 큰 할인을 제공해야 합니다.","They should offer a bigger discount.","offer a discount (할인을 하다)"],
+["그들은 합리적인 가격에 화장품을 판매합니다.","They sell cosmetics at a reasonable price.","at a low/reasonable price"],
+["저는 적립금을 많이 받았습니다.","I earned a lot of membership points.","membership points (적립금)"],
+["다양한 브랜드를 비교하기 편리합니다.","It is convenient to compare various brands.","compare A (A를 비교하다)"],
+["그들은 다양한 판촉 행사를 진행했습니다.","They held various promotional events.","promotional event (판촉 행사)"],
+["그들은 무료 배송 서비스를 제공합니다.","They offer free shipping service.","shipping service (배송 서비스)"],
+["직원들이 훌륭한 고객 서비스를 제공했습니다.","The staff provided excellent customer service.","customer service (고객 서비스)"],
+["저는 주로 동네 서점에서 책을 구입합니다.","I usually buy books at a local bookstore.","local store (동네 매장)"],
+["저는 직접 옷을 입어볼 수 있습니다.","I can try on clothes in person.","try on A (A를 입어보다)"],
+["저는 그것을 새 제품으로 교환했습니다.","I exchanged it for a new product.","exchange A for B"],
+["저는 그 책을 환불 받았습니다.","I got a refund for the book.","get a refund for A"],
+["저는 그 티셔츠를 반품했습니다.","I returned the t-shirt.","return A (A를 반품하다)"],
+["저는 한 장소에서 쇼핑할 수 있습니다.","I can shop in one place.","in one place (한 장소에서)"],
+["그 가방은 항상 품절이었습니다.","The bag was always sold out.","sold out (품절된)"],
+["저는 한 시간 정도 줄을 서서 기다렸습니다.","I waited in line for about an hour.","wait in line (줄을 서서 기다리다)"],
+["온라인 광고에는 허위 정보가 많습니다.","There is a lot of false information in online advertisements.","online advertisement (온라인 광고)"],
+["저는 그 가방을 구매할 여유가 없었습니다.","I could not afford the bag.","afford (경제적, 시간적 여유가 있다)"]
+]},
+"housing": {title:"housing", group:"빈출주제편 ②", items:[
+["도심지에서는 대중교통을 이용하기 편리합니다.","It is convenient to use public transportation in the downtown area.","downtown (도심, 시내 중심가)"],
+["시골에서는 의료 서비스를 받기가 어렵습니다.","It is difficult to get medical services in the countryside.","countryside (시골)"],
+["새 사무실은 도시 외곽에 위치해 있었습니다.","The new office was located in the suburbs.","in the suburbs (도시 외곽에)"],
+["요즘에는 많은 사람들이 이웃들과 말을 하지 않습니다.","These days, many people don't talk to their neighbors.","neighbors (이웃 사람)"],
+["우리 동네에 큰 공원이 있습니다.","There is a large park in my neighborhood.","neighborhood (주변 지역, 동네)"],
+["그 아파트 단지에는 다양한 편의시설이 있었습니다.","There were various amenities in the apartment complex.","apartment complex (아파트 단지)"],
+["저는 원룸 아파트에 살았었습니다.","I used to live in a studio apartment.","studio apartment (원룸 아파트)"],
+["한국에는 단독주택이 많지 않습니다.","There are not many single-family houses in Korea.","single-family home (단독주택)"],
+["월세와 공과금이 너무 비쌌습니다.","The monthly rent and utility bills were too expensive.","monthly rent (월세)"],
+["저는 집을 리모델링하는 데 많은 돈을 썼습니다.","I spent a lot of money on remodeling the house.","remodel house (집을 리모델링하다)"],
+["저희 집은 사무실에서 가깝습니다.","My house is close to my office.","be close to A (A에 가까운)"],
+["저는 층간소음으로 고생했습니다.","I suffered from the noise upstairs.","suffer from A (A로부터 고생하다)"]
+]},
+"trend": {title:"trend", group:"빈출주제편 ②", items:[
+["요즘 많은 사람들이 디지털 지갑을 사용합니다.","Many people use digital wallets nowadays.","nowadays (요즘)"],
+["많은 아이들이 더 이상 밖에서 놀지 않습니다.","Many children don't play outside anymore.","anymore (더 이상)"],
+["저는 수업 시간에 손으로 필기를 하곤 했습니다.","I used to take notes by hand in class.","used to V (과거에 ~하곤 했다)"],
+["젊은 사람들은 TV보다 스트리밍 서비스를 선호합니다.","Young people prefer streaming services over TV.","prefer A over B"],
+["친환경 제품이 인기를 얻고 있습니다.","Eco-friendly products are gaining popularity.","gain popularity (인기를 얻다)"],
+["종이 책들이 젊은 사람들 사이에서 인기를 잃고 있습니다.","Paper books are losing popularity among young people.","lose popularity (인기를 잃다)"],
+["전기차 시장이 한국에서 빠르게 성장하고 있습니다.","The electric car market is growing fast in Korea.","grow fast (빠르게 성장하다)"],
+["한국의 출산율이 둔화되고 있습니다.","The birth rate is slowing down in Korea.","slow down (둔화되다)"],
+["집에서 요리하는 것이 다시 유행하고 있습니다.","Cooking at home is becoming trendy again.","become trendy (유행하다)"],
+["점점 더 많은 사람들이 자신의 건강에 관심을 가지고 있습니다.","More and more people are taking an interest in their health.","more and more people"],
+["많은 사람들이 패키지여행에 참여하는 대신 자유여행을 합니다.","Many people travel independently instead of joining package tours.","instead of A (A 대신에)"],
+["혼자 사는 사람들의 수가 늘어나고 있습니다.","The number of people living alone is increasing.","the number of people -ing is increasing"]
+]},
+"travel": {title:"travel", group:"빈출주제편 ②", items:[
+["저는 태국으로 여행을 갔습니다.","I went on a trip to Thailand.","go on a trip (여행을 가다)"],
+["저는 중국으로 패키지 여행을 갔습니다.","I went on a package tour to China.","go on a package tour"],
+["그는 스페인으로 휴가를 갔습니다.","He went on a vacation to Spain.","go on a vacation (휴가를 가다)"],
+["저는 파리에서 가이드 투어를 했습니다.","I took a guided tour in Paris.","take a guided tour (가이드 투어를 하다)"],
+["저는 일 년에 한 번 정도 해외여행을 합니다.","I travel abroad about once a year.","travel abroad (해외여행을 하다)"],
+["우리는 더 이상 여행 가이드북이 필요하지 않습니다.","We don't need travel guidebooks anymore.","travel guide book (여행 가이드북)"],
+["저는 목적지에 빨리 도착할 수 있습니다.","I can get to my destination quickly.","get to A (A에 도착하다)"],
+["저는 자주 길을 잃었습니다.","I got lost often.","get lost (길을 잃다)"],
+["저는 길을 찾기 위해 스마트폰을 사용합니다.","I use a smartphone to find a way.","find a way (길을 찾다)"],
+["저는 짧은 시간 동안 많은 관광지를 방문했습니다.","I visited many tourist attractions in a short time.","tourist attraction (관광지)"],
+["우리는 아름다운 야경을 즐길 수 있습니다.","We can enjoy a beautiful night view.","view (경치)"],
+["저는 많은 현지인들을 만났습니다.","I met a lot of locals.","local (현지인)"],
+["저는 다양한 현지 음식을 즐겼습니다.","I enjoyed a variety of local foods.","local food (현지 음식)"],
+["그 도시는 매우 이국적이었습니다.","The city was very exotic.","exotic (이국적인/이색적인)"],
+["물가가 너무 비쌌습니다.","The cost of living was too high.","the cost of living (물가)"],
+["저는 여행 경비를 절약할 수 있었습니다.","I was able to save money on travel expenses.","travel expenses (여행 경비)"]
+]},
+"environment": {title:"environment", group:"빈출주제편 ②", items:[
+["저는 환경 오염에 별로 관심이 없었습니다.","I wasn't very interested in environmental pollution.","environmental pollution (환경 오염)"],
+["저는 재사용 장바구니 같은 친환경 제품을 사용합니다.","I use eco-friendly products such as a reusable bag.","eco-friendly products / reusable bag"],
+["그 이후로, 저는 보통 에너지 효율이 좋은 제품을 삽니다.","Since then, I usually buy energy-efficient products.","energy-efficient (에너지 효율적인)"],
+["저는 재활용하는 습관을 들일 수 있었습니다.","I was able to develop a habit of recycling.","recycle (재활용하다)"],
+["우리는 전기차를 이용함으로써 대기 오염을 줄일 수 있습니다.","We can reduce air pollution by using electric cars.","reduce pollution / electric car"],
+["우리는 환경 문제에 대한 인식을 높일 수 있습니다.","We can raise awareness of environmental issues.","raise awareness / environmental issue"],
+["우리는 일회용품을 더 적게 사용해야 합니다.","We should use fewer disposable products.","disposable products (일회용품)"],
+["우리는 환경을 보호하는 법을 배웠습니다.","We learned how to protect the environment.","protect the environment (환경을 보호하다)"],
+["그렇게 함으로써, 우리는 쓰레기를 줄일 수 있습니다.","By doing so, we can reduce waste.","reduce waste (쓰레기를 줄이다)"],
+["수질 오염은 요즘 점점 심각한 문제가 되고 있습니다.","Water pollution is becoming a serious issue nowadays.","water pollution / become a serious issue"],
+["그 강은 심하게 오염되어 있었습니다.","The river was heavily polluted.","be polluted (오염되다)"],
+["그들은 환경오염의 심각성을 깨달을 수 있습니다.","They can realize the seriousness of environmental pollution.","seriousness (심각성)"],
+["우리는 아파트 단지를 깨끗하게 유지할 수 있었습니다.","We were able to keep our apartment complex clean.","keep A clean (A를 깨끗하게 유지하다)"]
+]},
+"take": {title:"take", group:"기초편 ①", items:[
+["집에 가는데 두 시간 정도 걸립니다.","It takes about two hours to go home.","It takes about 시간"],
+["그녀는 필기를 하고 있습니다.","She is taking notes.","take notes (필기하다)"],
+["저는 버스를 하루에 두 번 탑니다.","I take a bus twice a day.","take 교통수단"],
+["회의는 오전 10시에 열릴 것입니다.","The meeting will take place at 10 A.M.","take place (열리다)"],
+["저는 온라인 강의를 들었습니다.","I took an online lecture.","take a lecture/class"],
+["한 여자가 사진을 찍고 있습니다.","A woman is taking a picture.","take a picture (사진을 찍다)"],
+["이 사진은 로비에서 찍힌 것 같습니다.","I think this picture was taken in a lobby.","a picture was taken"],
+["한 남자가 주문을 받고 있습니다.","A man is taking an order.","take an order (주문을 받다)"],
+["저는 주로 공원에서 산책을 합니다.","I usually take a walk in a park.","take a walk (산책을 하다)"],
+["그들은 직장에서 잠시 쉬고 있습니다.","They are taking a break at work.","take a break (잠시 쉬다)"],
+["그녀는 은행에서 대출을 받았습니다.","She took out a loan from a bank.","take out a loan (대출을 받다)"],
+["저는 30분 정도 낮잠을 잤습니다.","I took a nap for about 30 minutes.","take a nap (낮잠을 자다)"]
+]},
+"get": {title:"get", group:"기초편 ①", items:[
+["그는 취업을 하기 위해 열심히 공부했습니다.","He studied hard to get a job.","get a job (취업을 하다)"],
+["저는 토익에서 높은 점수를 받았습니다.","I got a high score on the TOEIC.","get a high score/good grades"],
+["저는 셔츠를 환불 받았습니다.","I got a refund on my shirt.","get a refund (환불 받다)"],
+["당신은 20달러를 할인 받을 수 있습니다.","You can get a $20 discount.","get a discount (할인을 받다)"],
+["저는 선생님께 자주 피드백을 받았습니다.","I got feedback often from my teacher.","get feedback (피드백을 받다)"],
+["우리는 트레이너에게 도움을 받을 수 있습니다.","We can get help from a trainer.","get help/support (도움을 받다)"],
+["저는 결과에 실망했습니다.","I got disappointed with the result.","get 형용사 (~한 상태가 되다)"],
+["그는 작년에 승진했습니다.","He got promoted last year.","get promoted (승진하다)"],
+["그는 제때에 월급을 받지 못했습니다.","He didn't get paid on time.","get paid (월급을 받다)"],
+["그녀는 모두와 잘 지냈습니다.","She got along with everyone.","get along with A (A와 잘 지내다)"],
+["저는 업무에 익숙해졌습니다.","I got used to my work.","get used to A (A에 익숙해지다)"]
+]},
+"do": {title:"do", group:"기초편 ①", items:[
+["그녀는 사업을 하기 위해 소셜미디어를 이용했습니다.","She used social media to do business.","do business (사업을 하다)"],
+["저는 IT 회사에서 인턴 근무를 했습니다.","I did an internship at an IT company.","do an internship (인턴 근무를 하다)"],
+["그는 직장에서 다양한 업무를 했습니다.","He did various tasks at work.","do a task (업무를 하다)"],
+["우리는 헬스장에서 다양한 운동을 할 수 있습니다.","We can do various exercises at the gym.","do exercise (운동을 하다)"],
+["그는 매일 요가를 했습니다.","He did yoga every day.","do yoga/weight training"],
+["저는 온라인에서 식료품 쇼핑을 합니다.","I do the grocery shopping online.","do the shopping (쇼핑을 하다)"],
+["저는 집안일을 혼자 해야 했습니다.","I had to do housework alone.","do housework (집안일을 하다)"],
+["저는 식사 후에 설거지를 하지 않아도 됩니다.","I don't have to do the dishes after eating.","do the dishes/laundry"],
+["제가 어렸을 때, 저는 자주 봉사활동을 했습니다.","When I was young, I did volunteer work often.","do volunteer work (봉사활동을 하다)"],
+["한 남자가 실험을 하고 있습니다.","A man is doing an experiment.","do an experiment (실험을 하다)"],
+["저는 AI에 관한 팀 프로젝트를 진행했습니다.","I did a team project on AI.","do a project (프로젝트를 진행하다)"]
+]},
+"go": {title:"go", group:"기초편 ①", items:[
+["저는 가족과 함께 시드니로 여행을 갔습니다.","I went on a trip to Sydney with my family.","go on a trip (여행을 하다)"],
+["저는 상하이로 패키지 투어를 갔습니다.","I went on a package tour to Shanghai.","go on a package tour"],
+["그는 파리로 휴가를 갔습니다.","He went on a vacation to Paris.","go on a vacation (휴가를 가다)"],
+["저는 런던으로 출장을 갔습니다.","I went on a business trip to London.","go on a business trip (출장을 가다)"],
+["저는 지하철로 출근합니다.","I go to work by subway.","go to school/work"],
+["저는 한 달에 한 번 정도 영화관에 갑니다.","I go to the movies about once a month.","go to the movies (영화를 보러 가다)"],
+["저는 저녁에 자주 산책을 합니다.","I often go for a walk in the evening.","go for a walk/run"],
+["저는 운동을 위해 등산을 합니다.","I go hiking for exercise.","go swimming/hiking/jogging"],
+["저는 보통 주말에 쇼핑하러 갑니다.","I usually go shopping on weekends.","go shopping (쇼핑을 하러 가다)"],
+["한 남자가 계단을 올라가고 있습니다.","A man is going up the stairs.","go up the stairs (계단을 올라가다)"],
+["보트가 강을 따라 가고 있습니다.","A boat is going along the river.","go along A (A를 따라 가다)"],
+["그 회사는 파산했습니다.","The company went bankrupt.","go bankrupt (파산하다)"]
+]},
+"make": {title:"make", group:"기초편 ①", items:[
+["저는 학교에서 많은 친구를 사귀었습니다.","I made many friends at school.","make friends (친구를 만들다)"],
+["저는 직장에서 자주 실수를 했습니다.","I often made mistakes at work.","make mistakes (실수를 하다)"],
+["저는 한 스타트업 회사에 투자를 했습니다.","I made an investment in a startup company.","make an investment (투자를 하다)"],
+["저는 온라인으로 예약을 했습니다.","I made a reservation online.","make a reservation (예약을 하다)"],
+["그 영화는 저를 슬프게 만들었습니다.","The movie made me sad.","make A 형용사 (A를 ~하게 만들다)"],
+["그는 우리에게 좋은 인상을 주었습니다.","He made a good impression on us.","make a 형용사 impression"],
+["그는 어려운 결정을 내렸습니다.","He made a difficult decision.","make a decision (결정을 내리다)"],
+["저는 일본여행 계획을 세웠습니다.","I made a plan to travel to Japan.","make a plan (계획을 세우다)"],
+["그들은 손님을 끌기 위해 노력했습니다.","They made an effort to attract customers.","make an effort (노력을 하다)"],
+["수익을 내기가 어려웠습니다.","It was difficult to make a profit.","make a profit (수익을 내다)"],
+["그는 많은 돈을 벌었습니다.","He made a lot of money.","make money (돈을 벌다)"]
+]},
+"have": {title:"have", group:"기초편 ①", items:[
+["저는 주로 집에서 저녁을 먹습니다.","I usually have dinner at home.","have breakfast/lunch/dinner"],
+["그들은 회의를 하고 있습니다.","They are having a meeting.","have a meeting/discussion"],
+["저는 과제가 많았습니다.","I had a lot of assignments.","have homework/assignment"],
+["저는 레스토랑에서 아르바이트를 했습니다.","I had a part-time job at a restaurant.","have a part-time job (아르바이트를 하다)"],
+["저는 유럽에 가본 적이 있습니다.","I have been to Europe.","have been to A (A에 가본 적 있다)"],
+["그녀는 신제품 홍보에 어려움을 겪었습니다.","She had difficulty promoting new products.","have difficulty v-ing"],
+["한 남자가 영상통화를 하고 있습니다.","A man is having a video call.","have a video call (영상통화를 하다)"],
+["저는 해외에서 공부할 기회가 있었습니다.","I had a chance to study abroad.","have a chance to V (~할 기회가 있다)"],
+["저는 공부할 시간이 충분하지 않았습니다.","I didn't have enough time to study.","have enough time to V"],
+["그는 마케팅 업무 경험이 있습니다.","He has experience in marketing.","have experience in A (A에 경험이 있다)"],
+["저는 건강하지 않은 생활습관을 가지고 있었습니다.","I had an unhealthy lifestyle.","have a 형용사 lifestyle"],
+["저는 늦게 자는 습관이 있습니다.","I have a habit of sleeping late.","have a habit of v-ing"],
+["사람들은 패션에 대한 취향이 다릅니다.","People have different tastes in fashion.","have different tastes in A"]
+]},
+"adj": {title:"형용사", group:"기초편 ②", items:[
+["저는 강의를 듣는 동안 지루했습니다.","I was bored during the lecture.","bored (지루한)"],
+["그 강의는 지루했습니다.","The lecture was boring.","boring (지루하게 만드는)"],
+["책상과 의자가 편안했습니다.","The desks and chairs were comfortable.","comfortable/uncomfortable"],
+["대도시에서 사업을 운영하는 것은 경쟁이 심합니다.","It is competitive to run a business in a big city.","competitive (경쟁이 심한)"],
+["우리는 새로운 규정에 혼란을 겪었습니다.","We got confused by the new rules.","confused (혼란스러운)"],
+["아파트에 사는 것은 편리합니다.","It is convenient to live in an apartment.","convenient/inconvenient"],
+["그 공원은 사람들로 붐볐습니다.","The park was crowded with people.","crowded (붐비는)"],
+["많은 회사들이 창의적인 직원을 선호합니다.","Many companies prefer creative employees.","creative (창의적인)"],
+["그는 세부적인 계획을 세웠습니다.","He made a detailed plan.","detailed (자세한, 세부적인)"],
+["저는 서비스에 실망했습니다.","I was disappointed with the service.","disappointed (실망한)"],
+["그 공연은 실망스러웠습니다.","The show was disappointing.","disappointing (실망하게 만드는)"],
+["저는 튼튼한 스마트폰이 필요합니다.","I need a durable smartphone.","durable (튼튼한, 내구성 있는)"],
+["그것은 스트레스 해소에 효과적입니다.","It is effective in relieving stress.","effective (효과적인)"],
+["저는 훌륭한 고객 서비스를 받았습니다.","I received excellent customer service.","excellent (훌륭한, 뛰어난)"],
+["그 영화는 흥미진진했습니다.","The movie was exciting.","exciting (흥미진진한, 신나는)"],
+["우리는 경험 많은 직원을 채용했습니다.","We hired an experienced employee.","experienced (경험이 많은)"],
+["그 강의는 즐거웠습니다.","The lecture was enjoyable.","enjoyable (즐거운, 유익한)"],
+["그 여행은 정말 재미있었습니다.","The trip was really fun.","fun (재미있는)"],
+["그는 자주 재미있는 농담을 했습니다.","He often told funny jokes.","funny (사람을 웃게 만드는)"],
+["우리는 건강한 식습관을 가질 수 있습니다.","We can have healthy eating habits.","healthy/unhealthy (건강한)"],
+["그의 조언은 매우 도움이 되었습니다.","His advice was very helpful.","helpful (도움이 되는)"],
+["제 고향에는 역사적인 장소가 많습니다.","My hometown has many historical places.","historical (역사적인)"],
+["그녀는 공부에 관심이 없었습니다.","She was not interested in studying.","interested (흥미, 관심이 있는)"],
+["저는 유명한 현지 식당들을 방문했습니다.","I visited famous local restaurants.","local (현지의)"],
+["우리는 호화로운 분위기에서 식사할 수 있습니다.","We can have a meal in a luxurious atmosphere.","luxurious (호화로운)"],
+["이것은 현대적인 미술 갤러리의 사진 같습니다.","I think this is a picture of a modern art gallery.","modern (현대적인)"],
+["그러실 필요는 없습니다.","That won't be necessary.","necessary (필요한)"],
+["저는 면접 전에 많이 긴장했습니다.","I was very nervous before the interview.","nervous (초조한, 긴장한)"],
+["한 남자가 오래되어 보이는 건물에 들어가고 있습니다.","A man is entering an old-looking building.","old-looking (오래되어 보이는)"],
+["그는 자기 일에 열정적이었습니다.","He was passionate about his job.","passionate (열정적인)"],
+["그는 인기 있는 지역에 카페를 열었습니다.","He opened a café in a popular area.","popular (인기 있는)"],
+["우리는 인턴십 동안 실용적인 기술을 배울 수 있습니다.","We can learn practical skills during internships.","practical (실용적인)"],
+["유튜브에는 전문적인 운동 영상이 많습니다.","There are many professional exercise videos on YouTube.","professional (전문적인)"],
+["우리는 조용한 분위기에서 책을 읽을 수 있습니다.","We can read books in a quiet atmosphere.","quiet (조용한)"],
+["그 매장은 합리적인 가격에 가구를 판매합니다.","The store sells furniture at a reasonable price.","reasonable (합리적인)"],
+["우리는 여유로운 환경에서 일할 수 있습니다.","We can work in a relaxed environment.","relaxed (느긋한, 여유로운)"],
+["그녀는 책임감이 매우 강했습니다.","She was very responsible.","responsible (책임감 있는)"],
+["저는 새 직장에 만족합니다.","I'm satisfied with my new job.","satisfied (만족한)"],
+["그는 많은 심각한 실수를 저질렀습니다.","He made many serious mistakes.","serious (심각한)"],
+["우리는 재정적으로 안정된 삶을 살 수 있습니다.","We can have a financially stable life.","stable (안정적인)"],
+["제 기말고사 성적은 끔찍했습니다.","My final exam grades were terrible.","terrible (끔찍한, 매우 나쁜)"],
+["저는 학교에서 항상 피곤했습니다.","I was always tired at school.","tired (피곤한)"],
+["우리는 그들의 전통 문화를 경험할 수 있습니다.","We can experience their traditional culture.","traditional (기존의, 전통적인)"],
+["그 동물원에는 독특한 동물이 많습니다.","The zoo has many unique animals.","unique (독특한)"],
+["그 스마트폰에는 유용한 기능이 많습니다.","The smartphone has many useful functions.","useful (유용한)"],
+["그녀는 직장에서 다양한 업무를 처리했습니다.","She handled various tasks at work.","various (다양한)"],
+["잘 알려진 브랜드는 편리한 고객 서비스를 제공합니다.","Well-known brands provide convenient customer service.","well-known (잘 알려진)"]
+]},
+"adv": {title:"부사", group:"기초편 ②", items:[
+["그는 자주 식사를 거르곤 했습니다.","He often skipped meals.","often (자주)"],
+["저는 가끔 밤을 새웠습니다.","I sometimes stayed up all night.","sometimes (가끔)"],
+["저는 보통 머릿속을 정리하기 위해 산책을 합니다.","I usually go for a walk to clear my head.","usually (보통, 주로)"],
+["그녀는 사무실에서 거의 말을 하지 않았습니다.","She rarely talked in the office.","rarely (드물게)"],
+["저는 실수로 노트북에 커피를 쏟았습니다.","I accidentally spilled coffee on my laptop.","accidentally (우연히, 실수로)"],
+["그는 자신의 의견을 분명하게 표현하지 않았습니다.","He didn't express his opinion clearly.","clearly (분명히)"],
+["그들은 편안하게 쉴 수 있습니다.","They can rest comfortably.","comfortably (편안하게)"],
+["우리는 편리하게 식료품을 쇼핑할 수 있습니다.","We can shop for groceries conveniently.","conveniently (편리하게)"],
+["그녀는 자신 있게 프레젠테이션을 했습니다.","She gave the presentation confidently.","confidently (자신 있게)"],
+["직원들은 더 창의적으로 일할 수 있습니다.","Employees can work more creatively.","creatively (창의적으로)"],
+["저는 아침 일찍 일어나지 않아도 됩니다.","I don't have to wake up early in the morning.","early (일찍)"],
+["저는 매일 늦게 잠자리에 들었습니다.","I went to bed late every day.","late (늦게)"],
+["우리는 스마트폰으로 쉽게 음식을 주문할 수 있습니다.","We can easily order food on a smartphone.","easily (쉽게)"],
+["우리는 보너스를 받기 위해 열심히 일했습니다.","We worked hard to get a bonus.","hard (열심히)"],
+["우리는 효과적으로 스트레스를 완화할 수 있습니다.","We can effectively relieve stress.","effectively (효과적으로)"],
+["우리는 시간을 더 효율적으로 사용할 수 있습니다.","We can use our time more efficiently.","efficiently (효율적으로)"],
+["그는 결국 작년에 그 식당을 닫았습니다.","He eventually closed the restaurant last year.","eventually (결국에는)"],
+["그녀는 수업을 즐겁게 진행했습니다.","She taught the class enjoyably.","enjoyably (즐겁게)"],
+["다행히도, 우리는 마감 기한을 지켰습니다.","Fortunately, we met the deadline.","fortunately (다행히도)"],
+["우리는 업무에 빠르게 적응할 수 있습니다.","We can adapt to our work quickly.","fast/quickly (빠르게)"],
+["우리는 자유롭게 의견을 표현할 수 있었습니다.","We were able to express our opinions freely.","freely (자유롭게)"],
+["제 성적이 점점 향상되었습니다.","My grades improved gradually.","gradually (점차, 서서히)"],
+["그는 자신의 실수를 솔직하게 보고했습니다.","He reported his mistake honestly.","honestly (솔직하게)"],
+["우리는 더 여유롭게 여행할 수 있습니다.","We can travel more leisurely.","leisurely (여유롭게)"],
+["그는 불만사항을 능숙하게 처리했습니다.","He handled complaints professionally.","professionally (전문적으로, 능숙하게)"],
+["저는 최근에 새 집으로 이사했습니다.","I recently moved to a new house.","recently (최근에)"],
+["저는 건강을 유지하기 위해 규칙적으로 운동합니다.","I exercise regularly to stay healthy.","regularly (규칙적으로)"],
+["우리는 영상을 반복해서 볼 수 있습니다.","We can watch the videos repeatedly.","repeatedly (반복적으로)"],
+["그녀는 학생들의 고민을 진심으로 들어주었습니다.","She sincerely listened to students' worries.","sincerely (진심으로)"],
+["구체적으로 말하면, 우리는 출퇴근 시간을 절약할 수 있습니다.","Specifically, we can save time on commuting.","specifically (구체적으로)"],
+["우리는 체계적으로 일하는 법을 배울 수 있습니다.","We can learn to work systematically.","systematically (체계적으로)"]
+]}
+};
+
+const GROUP_ORDER = ["핵심구문편","빈출주제편 ①","빈출주제편 ②","기초편 ①","기초편 ②"];
+
+/* build flat list */
+let ALL = [];
+Object.keys(DATA).forEach(catId=>{
+  DATA[catId].items.forEach((it,i)=>{
+    ALL.push({id: catId+"_"+i, cat:catId, kr:it[0], en:it[1], tag:it[2]||DATA[catId].title});
+  });
+});
+document.getElementById('totalCountLabel').textContent = ALL.length;
+
+/* ================= STATE ================= */
+let progress = {}; // id -> {box:0-4, seen:0}
+let activeCats = new Set(Object.keys(DATA)); // all selected by default
+let mode = "all";
+let queue = [];
+let qi = 0;
+
+async function loadProgress(){
+  try{
+    if(window.storage && typeof window.storage.get === 'function'){
+      const res = await window.storage.get('toeic_progress_v1', false);
+      if(res && res.value){ progress = JSON.parse(res.value); }
+    }else{
+      const raw = localStorage.getItem('toeic_progress_v1');
+      if(raw){ progress = JSON.parse(raw); }
+    }
+  }catch(e){ progress = {}; }
+  buildQueue();
+  renderStats();
+}
+async function saveProgress(){
+  try{
+    if(window.storage && typeof window.storage.set === 'function'){
+      await window.storage.set('toeic_progress_v1', JSON.stringify(progress), false);
+    }else{
+      localStorage.setItem('toeic_progress_v1', JSON.stringify(progress));
+    }
+  }catch(e){}
+}
+
+function boxOf(id){ return progress[id]?.box || 0; }
+
+/* ================= UI: category chips ================= */
+function renderCats(){
+  const box = document.getElementById('catbox');
+  box.innerHTML = "";
+  let allChip = document.createElement('div');
+  allChip.className = "chips";
+  const allBtn = document.createElement('div');
+  allBtn.className = "chip active";
+  allBtn.id = "chipAll";
+  allBtn.textContent = "전체 카테고리";
+  allBtn.onclick = ()=>{
+    activeCats = new Set(Object.keys(DATA));
+    refreshChipStates();
+    buildQueue();
+  };
+  allChip.appendChild(allBtn);
+  box.appendChild(allChip);
+
+  GROUP_ORDER.forEach(g=>{
+    const label = document.createElement('div');
+    label.className = "grouplabel";
+    label.textContent = g;
+    box.appendChild(label);
+    const chips = document.createElement('div');
+    chips.className = "chips";
+    Object.keys(DATA).forEach(catId=>{
+      if(DATA[catId].group !== g) return;
+      const c = document.createElement('div');
+      c.className = "chip active";
+      c.dataset.cat = catId;
+      c.innerHTML = DATA[catId].title + " <small>"+DATA[catId].items.length+"</small>";
+      c.onclick = ()=>{
+        if(activeCats.has(catId)){ activeCats.delete(catId); }
+        else{ activeCats.add(catId); }
+        if(activeCats.size===0){ activeCats.add(catId); }
+        refreshChipStates();
+        buildQueue();
+      };
+      chips.appendChild(c);
+    });
+    box.appendChild(chips);
+  });
+}
+function refreshChipStates(){
+  document.querySelectorAll('.chip[data-cat]').forEach(c=>{
+    c.classList.toggle('active', activeCats.has(c.dataset.cat));
+  });
+  document.getElementById('chipAll').classList.toggle('active', activeCats.size===Object.keys(DATA).length);
+}
+
+/* ================= mode buttons ================= */
+document.querySelectorAll('.modebtn').forEach(btn=>{
+  btn.onclick = ()=>{
+    document.querySelectorAll('.modebtn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    mode = btn.dataset.mode;
+    buildQueue();
+  };
+});
+
+/* ================= build queue ================= */
+function buildQueue(){
+  let pool = ALL.filter(it=>activeCats.has(it.cat));
+  if(mode === "weak"){
+    pool = pool.filter(it=> boxOf(it.id) < 3 );
+  } else if(mode === "mastered"){
+    pool = pool.filter(it=> boxOf(it.id) >= 3 );
+  }
+  // weighted shuffle: lower box appears earlier more often, but keep full pool
+  pool.sort((a,b)=> boxOf(a.id) - boxOf(b.id) + (Math.random()-0.5)*1.5 );
+  queue = pool;
+  qi = 0;
+  renderStats();
+  showCard();
+}
+
+function shuffleQueue(){
+  for(let i=queue.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [queue[i],queue[j]]=[queue[j],queue[i]];
+  }
+  qi = 0;
+  showCard();
+}
+document.getElementById('shuffleBtn').onclick = shuffleQueue;
+
+/* ================= render stats ================= */
+function renderStats(){
+  const pool = ALL.filter(it=>activeCats.has(it.cat));
+  let mastered=0, learning=0, brandnew=0;
+  pool.forEach(it=>{
+    const b = boxOf(it.id);
+    if(b>=3) mastered++;
+    else if(b>0) learning++;
+    else brandnew++;
+  });
+  document.getElementById('statTotal').textContent = pool.length;
+  document.getElementById('statMastered').textContent = mastered;
+  document.getElementById('statLearning').textContent = learning;
+  document.getElementById('statNew').textContent = brandnew;
+}
+
+/* ================= card rendering ================= */
+function showCard(){
+  stopRecordingIfActive();
+  const card = document.getElementById('card');
+  const reveal = document.getElementById('revealArea');
+  const diff = document.getElementById('diffLine');
+  const answerInput = document.getElementById('answerInput');
+  reveal.classList.remove('show');
+  reveal.textContent = "";
+  diff.textContent = "";
+  answerInput.value = "";
+  document.getElementById('preRevealBtns').style.display = "flex";
+  document.getElementById('postRevealBtns').style.display = "none";
+
+  if(queue.length === 0){
+    card.dataset.idx = "";
+    document.getElementById('cardTag').textContent = "해당 카드 없음";
+    document.getElementById('krText').textContent = "선택한 조건에 맞는 문장이 없습니다. 카테고리나 모드를 바꿔보세요.";
+    document.getElementById('progressFill').style.width = "0%";
+    return;
+  }
+  if(qi >= queue.length) qi = 0;
+  if(qi < 0) qi = queue.length-1;
+  const it = queue[qi];
+  card.dataset.idx = (qi+1)+" / "+queue.length;
+  document.getElementById('cardTag').textContent = it.tag;
+  document.getElementById('krText').textContent = it.kr;
+  document.getElementById('progressFill').style.width = ((qi+1)/queue.length*100)+"%";
+  answerInput.focus();
+}
+
+function doReveal(){
+  stopRecordingIfActive();
+  const it = queue[qi];
+  if(!it) return;
+  const reveal = document.getElementById('revealArea');
+  reveal.textContent = it.en;
+  reveal.classList.add('show');
+  document.getElementById('preRevealBtns').style.display = "none";
+  document.getElementById('postRevealBtns').style.display = "flex";
+
+  const typed = document.getElementById('answerInput').value.trim();
+  const diff = document.getElementById('diffLine');
+  if(typed.length>0){
+    const norm = s=>s.toLowerCase().replace(/[.,!?']/g,"").trim();
+    if(norm(typed) === norm(it.en)){
+      diff.innerHTML = '<span class="ok">✓ 정확히 일치합니다!</span>';
+    }else{
+      diff.innerHTML = '<span class="bad">다릅니다 — 정답과 비교해보세요.</span>';
+    }
+  }else{
+    diff.textContent = "";
+  }
+}
+document.getElementById('revealBtn').onclick = doReveal;
+document.getElementById('answerInput').addEventListener('keydown', e=>{
+  if(e.key==='Enter'){ e.preventDefault(); doReveal(); }
+});
+
+document.querySelectorAll('#postRevealBtns .btn').forEach(btn=>{
+  btn.onclick = async ()=>{
+    const it = queue[qi];
+    if(!it) return;
+    const rate = parseInt(btn.dataset.rate,10); // 0 dontknow, 1 unsure, 2 know
+    if(!progress[it.id]) progress[it.id] = {box:0, seen:0};
+    progress[it.id].seen += 1;
+    if(rate === 0) progress[it.id].box = Math.max(0, progress[it.id].box - 1);
+    else if(rate === 1) progress[it.id].box = Math.min(4, progress[it.id].box);
+    else progress[it.id].box = Math.min(4, progress[it.id].box + 1);
+    await saveProgress();
+    renderStats();
+    qi++;
+    if(qi >= queue.length){ buildQueue(); }
+    else{ showCard(); }
+  };
+});
+
+document.getElementById('prevBtn').onclick = ()=>{ qi--; showCard(); };
+
+document.getElementById('resetLink').onclick = async ()=>{
+  if(confirm("정말 모든 학습 기록을 초기화할까요? 되돌릴 수 없습니다.")){
+    progress = {};
+    await saveProgress();
+    buildQueue();
+  }
+};
+
+/* ================= speech recognition (mic → auto text) ================= */
+const micBtn = document.getElementById('micBtn');
+const micStatus = document.getElementById('micStatus');
+const answerInputEl = document.getElementById('answerInput');
+const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognizer = null;
+let isRecording = false;
+let baseTextBeforeRecording = "";
+
+if(!SpeechRecognitionCtor){
+  micBtn.classList.add('unsupported');
+  micBtn.title = "이 브라우저는 음성 인식을 지원하지 않습니다";
+  micStatus.textContent = "이 브라우저에서는 음성 녹음이 지원되지 않아요. 타이핑으로 입력해주세요.";
+}else{
+  recognizer = new SpeechRecognitionCtor();
+  recognizer.lang = "en-US";
+  recognizer.continuous = true;
+  recognizer.interimResults = true;
+
+  recognizer.onstart = ()=>{
+    isRecording = true;
+    micBtn.classList.add('recording');
+    micBtn.textContent = "⏹";
+    micStatus.textContent = "듣고 있어요... 영어로 말해보세요.";
+    micStatus.classList.add('live');
+  };
+
+  recognizer.onresult = (event)=>{
+    let finalChunk = "";
+    let interimChunk = "";
+    for(let i=event.resultIndex; i<event.results.length; i++){
+      const transcript = event.results[i][0].transcript;
+      if(event.results[i].isFinal){ finalChunk += transcript; }
+      else{ interimChunk += transcript; }
+    }
+    if(finalChunk){
+      baseTextBeforeRecording = (baseTextBeforeRecording + " " + finalChunk).trim();
+    }
+    answerInputEl.value = (baseTextBeforeRecording + " " + interimChunk).trim();
+  };
+
+  recognizer.onerror = (event)=>{
+    isRecording = false;
+    micBtn.classList.remove('recording');
+    micBtn.textContent = "🎤";
+    micStatus.classList.remove('live');
+    if(event.error === 'not-allowed' || event.error === 'service-not-allowed'){
+      micStatus.textContent = "마이크 권한이 거부되었습니다. 브라우저 설정에서 마이크 접근을 허용해주세요.";
+    }else if(event.error === 'no-speech'){
+      micStatus.textContent = "음성이 감지되지 않았어요. 다시 시도해보세요.";
+    }else{
+      micStatus.textContent = "음성 인식 중 오류가 발생했습니다 (" + event.error + "). 타이핑으로 입력해주세요.";
+    }
+  };
+
+  recognizer.onend = ()=>{
+    isRecording = false;
+    micBtn.classList.remove('recording');
+    micBtn.textContent = "🎤";
+    if(micStatus.classList.contains('live')){
+      micStatus.textContent = "녹음이 끝났어요. 결과를 확인하고 필요하면 수정하세요.";
+      micStatus.classList.remove('live');
+    }
+  };
+
+  micBtn.onclick = ()=>{
+    if(isRecording){
+      recognizer.stop();
+      return;
+    }
+    baseTextBeforeRecording = answerInputEl.value.trim();
+    try{
+      recognizer.start();
+    }catch(e){
+      micStatus.textContent = "녹음을 시작할 수 없습니다. 잠시 후 다시 시도해주세요.";
+    }
+  };
+}
+
+function stopRecordingIfActive(){
+  if(isRecording && recognizer){ recognizer.stop(); }
+}
+
+/* ================= init ================= */
+renderCats();
+loadProgress();
+</script>
+</body>
+</html>
