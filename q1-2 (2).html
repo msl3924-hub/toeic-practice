@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOEIC Speaking Q1-2 실전연습</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap');
+  :root {
+    --bg: #0f1319; --surface: #1a2029; --surface-2: #222937; --border: #2e3646;
+    --text-primary: #eef1f6; --text-secondary: #9aa5b6; --text-muted: #6b7688;
+    --accent: #5b9bff; --accent-soft: rgba(91,155,255,0.12);
+    --amber: #f5b544; --amber-soft: rgba(245,181,68,0.14);
+    --success: #4fd68f; --success-soft: rgba(79,214,143,0.12);
+    --danger: #ff6b6b; --danger-soft: rgba(255,107,107,0.14);
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: radial-gradient(circle at 50% 0%, #171d27 0%, #0f1319 60%); color: var(--text-primary); font-family: 'Noto Sans KR', 'Manrope', sans-serif; min-height: 100vh; padding: 32px 16px 60px; display: flex; justify-content: center; }
+  .wrap { width: 100%; max-width: 560px; }
+  header { margin-bottom: 22px; }
+  .eyebrow { font-family: 'Manrope', sans-serif; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 800; margin-bottom: 8px; }
+  h1 { font-size: 22px; font-weight: 800; margin: 0 0 6px; }
+  .subtitle { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+  .steps { display: flex; gap: 6px; margin: 20px 0; }
+  .step-pill { flex: 1; height: 5px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
+  .step-pill-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.4s ease; }
+  .step-pill.done .step-pill-fill { width: 100%; background: var(--success); }
+  .step-pill.active .step-pill-fill { width: 100%; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+  .mic-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom:16px; }
+  .mic-status { font-weight: 700; margin-bottom: 6px; }
+  .mic-status.granted { color: var(--success); }
+  .mic-status.denied { color: var(--danger); }
+  .mic-status.pending { color: var(--amber); }
+  .action-btn { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--accent); color: #0a0e14; font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 14px; cursor: pointer; margin-top:14px; }
+  .action-btn.secondary { background: var(--surface-2); color: var(--text-primary); border: 1px solid var(--border); }
+  .action-btn.danger { background: var(--danger-soft); color: var(--danger); border: 1px solid var(--danger); }
+  .btn-row { display: flex; gap: 10px; }
+  .btn-row .action-btn { flex: 1; }
+  .back-link { display:inline-block; margin-bottom:14px; font-size:13px; color:var(--text-muted); cursor:pointer; text-decoration:none; }
+  .back-link:hover { color: var(--accent); }
+  .toolbar-row { display:flex; gap:8px; margin-bottom:14px; }
+  .toolbar-row .action-btn { flex:1; font-size:12px; padding:10px; margin-top:0; }
+  .topic-list { display:flex; flex-direction:column; gap:10px; }
+  .topic-list-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px; cursor:pointer; position:relative; display:flex; gap:12px; align-items:center; }
+  .topic-list-card:hover { border-color: var(--accent); }
+  .topic-list-card.custom { border-color: rgba(91,155,255,0.4); }
+  .topic-list-card img { width:70px; height:52px; object-fit:cover; border-radius:8px; flex-shrink:0; background: var(--surface-2); }
+  .topic-list-card .tlc-title { font-family:'Manrope',sans-serif; font-weight:700; font-size:14px; }
+  .add-card-row { background: var(--surface); border: 1px dashed var(--border); border-radius: 14px; padding: 16px 18px; cursor:pointer; text-align:center; color: var(--text-muted); font-size:14px; }
+  .add-card-row:hover { border-color: var(--accent); color: var(--accent); }
+  .del-btn-row { position:absolute; top:8px; right:8px; width:22px; height:22px; border-radius:50%; background:rgba(15,19,25,0.85); color: var(--danger); border: none; font-size:13px; cursor:pointer; }
+  .q-label { font-family: 'Manrope', sans-serif; font-size: 12px; font-weight: 800; letter-spacing: 0.08em; color: var(--accent); text-transform: uppercase; margin-bottom: 12px; }
+  .passage-image { width:100%; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 14px; display:block; }
+  .phase-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; text-align: center; }
+  .phase-tag { display: inline-block; font-family: 'Manrope', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; padding: 5px 12px; border-radius: 20px; margin-bottom: 14px; }
+  .phase-tag.prep { background: var(--amber-soft); color: var(--amber); }
+  .phase-tag.answer { background: var(--accent-soft); color: var(--accent); }
+  .rec-dot { display:inline-block; width:8px; height:8px; border-radius:50%; background: var(--danger); margin-right:6px; animation: pulse 1s infinite; vertical-align:middle; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+  .timer-ring-wrap { position: relative; width: 140px; height: 140px; margin: 0 auto 14px; }
+  .timer-ring-wrap svg { transform: rotate(-90deg); }
+  .timer-ring-bg { fill: none; stroke: var(--surface-2); stroke-width: 8; }
+  .timer-ring-fg { fill: none; stroke: var(--accent); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+  .timer-number { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 38px; font-weight: 700; }
+  .phase-hint { font-size: 13px; color: var(--text-secondary); }
+  .live-transcript { margin-top: 12px; min-height: 40px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 13px; color: var(--text-primary); text-align: left; line-height: 1.6; }
+  .live-transcript .placeholder { color: var(--text-muted); }
+  .review-block { margin-top: 14px; }
+  .review-label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+  .review-text { background: var(--success-soft); border-radius: 10px; padding: 14px 16px; font-size: 14px; line-height: 1.7; color: var(--text-primary); }
+  .review-text.transcript-box { background: var(--surface-2); }
+  audio { width: 100%; margin-top: 4px; }
+  .done-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px 22px; text-align: center; }
+  .done-card .big { font-size: 40px; margin-bottom: 8px; }
+  .done-card p { color: var(--text-secondary); font-size: 14px; line-height: 1.6; }
+  .field-label { font-size:12px; color: var(--text-muted); margin: 16px 0 6px; }
+  .text-input { width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background: var(--surface-2); color: var(--text-primary); font-family:'Noto Sans KR',sans-serif; font-size:14px; }
+  textarea.text-input { min-height: 90px; resize: vertical; line-height:1.6; }
+  .qa-block { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-top: 14px; }
+  .qa-block-title { font-family:'Manrope',sans-serif; font-weight:800; font-size:12px; color: var(--accent); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:10px; }
+  .paste-area { background: var(--surface-2); border: 2px dashed var(--border); border-radius: 12px; min-height: 130px; display:flex; align-items:center; justify-content:center; text-align:center; flex-direction:column; cursor:pointer; padding: 14px; }
+  .paste-area:hover { border-color: var(--accent); }
+  .paste-area img { max-width:100%; max-height:180px; border-radius:8px; }
+  .paste-hint { font-size:12px; color: var(--text-muted); line-height:1.6; }
+  .rec-row { display:flex; gap:8px; margin-top:8px; }
+  .rec-row .action-btn { flex:1; margin-top:0; padding:10px; font-size:13px; }
+  .mini-status { font-size:12px; color: var(--text-muted); text-align:center; margin-top:6px; }
+  .footer-note { margin-top: 28px; font-size: 12px; color: var(--text-muted); text-align: center; line-height: 1.6; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">TOEIC Speaking · Read a Text Aloud</div>
+    <h1>Questions 1-2 실전연습</h1>
+    <div class="subtitle">준비 45초 / 답변 45초. 화면에 뜨는 지문 사진을 보고 소리 내어 읽는 연습이에요.</div>
+  </header>
+
+  <div class="steps" id="steps" style="display:none;"></div>
+
+  <div class="screen active" id="screen-mic">
+    <div class="mic-box">
+      <div class="mic-status pending" id="mic-status">마이크 연결 안 됨</div>
+      <div id="mic-desc">읽는 내용을 녹음하고 자동 인식하려면 마이크 권한이 필요해요.</div>
+    </div>
+    <button class="action-btn" id="mic-btn">마이크 권한 허용하기</button>
+  </div>
+
+  <div class="screen" id="screen-select">
+    <a href="index.html" class="back-link">← 홈으로</a>
+    <div class="toolbar-row">
+      <button class="action-btn secondary" id="export-btn">⬇ 내보내기</button>
+      <button class="action-btn secondary" id="import-btn">⬆ 가져오기</button>
+      <input type="file" id="import-file" accept="application/json" style="display:none;">
+    </div>
+    <div class="topic-list" id="topic-list"></div>
+  </div>
+
+  <div class="screen" id="screen-question">
+    <span class="back-link" id="back-to-list-1">← 목록으로</span>
+    <div class="q-label" id="q-label"></div>
+    <img class="passage-image" id="passage-image" src="" alt="passage">
+    <div class="phase-card">
+      <div class="phase-tag prep" id="phase-tag">준비 시간</div>
+      <div class="timer-ring-wrap">
+        <svg width="140" height="140">
+          <circle class="timer-ring-bg" cx="70" cy="70" r="62"></circle>
+          <circle class="timer-ring-fg" id="timer-ring-fg" cx="70" cy="70" r="62"></circle>
+        </svg>
+        <div class="timer-number" id="timer-number">45</div>
+      </div>
+      <div class="phase-hint" id="phase-hint">지문을 눈으로 읽으며 발음/억양을 준비하세요.</div>
+      <div class="live-transcript" id="live-transcript" style="display:none;"><span class="placeholder">말하기를 시작하면 여기에 실시간으로 텍스트가 나타나요...</span></div>
+      <button class="action-btn secondary" id="skip-prep-btn" style="display:none;">준비시간 건너뛰고 바로 읽기</button>
+      <button class="action-btn danger" id="stop-early-btn" style="display:none;">지금 답변 종료하고 확인하기</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-review">
+    <div class="q-label" id="review-q-label"></div>
+    <img class="passage-image" id="r-passage-image" src="" alt="passage">
+    <div class="review-block">
+      <div class="review-label">🎧 내 녹음 듣기</div>
+      <audio controls id="review-audio"></audio>
+    </div>
+    <div class="review-block">
+      <div class="review-label">📝 자동 인식된 내 읽기 (이번 연습)</div>
+      <div class="review-text transcript-box" id="review-transcript"></div>
+    </div>
+    <div class="review-block">
+      <div class="review-label">✅ 세트 만들 때 녹음해둔 참고 텍스트</div>
+      <div class="review-text" id="review-answer"></div>
+    </div>
+    <div class="btn-row" style="margin-top:18px;">
+      <button class="action-btn secondary" id="repeat-btn">이 지문 다시</button>
+      <button class="action-btn" id="continue-btn">다음 지문 →</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-done">
+    <div class="done-card">
+      <div class="big">🎯</div>
+      <h2 style="margin:0 0 8px; font-size:18px;">이 세트 연습 완료!</h2>
+      <p>Q1, Q2 모두 실전 시간에 맞춰 연습하셨어요.</p>
+    </div>
+    <div class="btn-row" style="margin-top:16px;">
+      <button class="action-btn secondary" id="back-to-list-2">목록으로</button>
+      <button class="action-btn" id="restart-btn">이 세트 다시</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-create">
+    <span class="back-link" id="back-to-list-3">← 목록으로</span>
+    <div class="q-label">새 세트 추가 (Q1-2)</div>
+    <div class="field-label">세트 이름 (선택)</div>
+    <input type="text" class="text-input" id="new-title-input" placeholder="예: [내 세트] 반도체 지문">
+
+    <div class="qa-block">
+      <div class="qa-block-title">Question 1 · 준비 45초 / 답변 45초</div>
+      <div class="field-label" style="margin-top:0;">지문 사진 붙여넣기</div>
+      <div class="paste-area" id="paste-area-0" tabindex="0">
+        <div id="paste-placeholder-0">
+          <div style="font-size:22px;">📋</div>
+          <div class="paste-hint">클릭 후 <b>Ctrl+V</b>로 지문 사진 붙여넣기</div>
+        </div>
+        <img id="paste-preview-0" style="display:none;">
+      </div>
+      <input type="file" id="file-input-0" accept="image/*" style="display:none;">
+      <button class="action-btn secondary" id="choose-file-btn-0" style="margin-top:8px;">📁 파일 선택</button>
+      <div class="field-label">지문 읽고 녹음하기 (참고 텍스트 자동 생성)</div>
+      <div class="rec-row"><button class="action-btn" id="rec-btn-0">🎙️ 읽고 녹음하기</button></div>
+      <div class="mini-status" id="rec-status-0"></div>
+      <div class="field-label">인식된 텍스트 (직접 수정 가능)</div>
+      <textarea class="text-input" id="q1-answer-input" placeholder="녹음하면 텍스트가 채워져요"></textarea>
+    </div>
+
+    <div class="qa-block">
+      <div class="qa-block-title">Question 2 · 준비 45초 / 답변 45초</div>
+      <div class="field-label" style="margin-top:0;">지문 사진 붙여넣기</div>
+      <div class="paste-area" id="paste-area-1" tabindex="0">
+        <div id="paste-placeholder-1">
+          <div style="font-size:22px;">📋</div>
+          <div class="paste-hint">클릭 후 <b>Ctrl+V</b>로 지문 사진 붙여넣기</div>
+        </div>
+        <img id="paste-preview-1" style="display:none;">
+      </div>
+      <input type="file" id="file-input-1" accept="image/*" style="display:none;">
+      <button class="action-btn secondary" id="choose-file-btn-1" style="margin-top:8px;">📁 파일 선택</button>
+      <div class="field-label">지문 읽고 녹음하기 (참고 텍스트 자동 생성)</div>
+      <div class="rec-row"><button class="action-btn" id="rec-btn-1">🎙️ 읽고 녹음하기</button></div>
+      <div class="mini-status" id="rec-status-1"></div>
+      <div class="field-label">인식된 텍스트 (직접 수정 가능)</div>
+      <textarea class="text-input" id="q2-answer-input" placeholder="녹음하면 텍스트가 채워져요"></textarea>
+    </div>
+
+    <button class="action-btn" id="save-set-btn">✅ 이 세트 저장하기</button>
+  </div>
+
+  <div class="footer-note">음성 인식은 Chrome 브라우저에서 가장 잘 작동해요.</div>
+</div>
+
+<script>
+const STORAGE_KEY = 'toeic_q12_custom_v2';
+function loadCustomTopics(){ try { const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : []; } catch(err){ return []; } }
+function saveCustomTopics(){ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(customTopics)); } catch(err){} }
+let customTopics = loadCustomTopics();
+
+const PLACEHOLDER_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="240"><rect width="400" height="240" fill="#222937"/><text x="50%" y="50%" fill="#6b7688" font-size="16" text-anchor="middle" font-family="sans-serif">예시 지문 이미지</text></svg>');
+
+const builtinTopics = [
+  {
+    title: "[1] 예시 세트 안내",
+    questions: [
+      { label: "Question 1", prep: 45, answer: 45, image: PLACEHOLDER_IMG,
+        myAnswer: "Welcome to Riverside Technology Conference. Before we begin today's keynote session, I would like to remind everyone that lunch will be served in the main hall starting at noon." },
+      { label: "Question 2", prep: 45, answer: 45, image: PLACEHOLDER_IMG,
+        myAnswer: "Thank you for calling Green Valley Electronics customer service. Our office hours are Monday through Friday, from nine in the morning until six in the evening." }
+    ]
+  }
+];
+
+let topics = builtinTopics.concat(customTopics);
+function rebuildTopics(){ topics = builtinTopics.concat(customTopics); }
+
+let currentTopicIndex = 0;
+let currentTopic = topics[0];
+let currentQIndex = 0;
+let timerInterval = null;
+let mediaStream = null;
+let mediaRecorder = null;
+let audioChunks = [];
+let recognition = null;
+let liveTranscript = '';
+const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('steps').style.display = (id === 'screen-question' || id === 'screen-review') ? 'flex' : 'none';
+}
+
+document.getElementById('mic-btn').addEventListener('click', async ()=>{
+  const statusEl = document.getElementById('mic-status');
+  const descEl = document.getElementById('mic-desc');
+  statusEl.textContent = '권한 요청 중...';
+  statusEl.className = 'mic-status pending';
+  try {
+    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    statusEl.textContent = '✓ 마이크 연결됨';
+    statusEl.className = 'mic-status granted';
+    descEl.textContent = '이제 세트를 골라서 연습할 수 있어요.';
+    setTimeout(()=>{ renderTopicList(); showScreen('screen-select'); }, 500);
+  } catch(err) {
+    statusEl.textContent = '✗ 마이크 권한이 거부되었어요';
+    statusEl.className = 'mic-status denied';
+    descEl.textContent = '브라우저 사이트 정보 아이콘에서 마이크 권한을 허용한 뒤 새로고침 해주세요.';
+  }
+});
+
+function renderTopicList(){
+  rebuildTopics();
+  const list = document.getElementById('topic-list');
+  list.innerHTML = '';
+  const addCard = document.createElement('div');
+  addCard.className = 'add-card-row';
+  addCard.textContent = '+ 새 세트 추가';
+  addCard.addEventListener('click', openCreateScreen);
+  list.appendChild(addCard);
+
+  topics.forEach((t,i)=>{
+    const isCustom = i >= builtinTopics.length;
+    const card = document.createElement('div');
+    card.className = 'topic-list-card' + (isCustom ? ' custom' : '');
+    card.innerHTML = '<img src="'+t.questions[0].image+'"><div class="tlc-title">'+t.title+'</div>';
+    card.addEventListener('click', ()=>{ currentTopicIndex = i; currentTopic = topics[i]; currentQIndex = 0; startQuestion(); });
+    if(isCustom){
+      const delBtn = document.createElement('button');
+      delBtn.className = 'del-btn-row';
+      delBtn.textContent = '×';
+      delBtn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        if(confirm('이 세트를 삭제할까요?')){
+          customTopics.splice(i - builtinTopics.length, 1);
+          saveCustomTopics();
+          renderTopicList();
+        }
+      });
+      card.appendChild(delBtn);
+    }
+    list.appendChild(card);
+  });
+}
+document.getElementById('back-to-list-1').addEventListener('click', ()=>{ renderTopicList(); showScreen('screen-select'); });
+document.getElementById('back-to-list-2').addEventListener('click', ()=>{ renderTopicList(); showScreen('screen-select'); });
+document.getElementById('back-to-list-3').addEventListener('click', ()=>{ renderTopicList(); showScreen('screen-select'); });
+
+function renderSteps(){
+  const stepsDiv = document.getElementById('steps');
+  stepsDiv.innerHTML = '';
+  currentTopic.questions.forEach((q,i)=>{
+    const pill = document.createElement('div');
+    pill.className = 'step-pill';
+    if(i < currentQIndex) pill.classList.add('done');
+    else if(i === currentQIndex) pill.classList.add('active');
+    pill.innerHTML = '<div class="step-pill-fill"></div>';
+    stepsDiv.appendChild(pill);
+  });
+}
+
+const CIRC = 2 * Math.PI * 62;
+document.getElementById('timer-ring-fg').style.strokeDasharray = CIRC;
+
+function startRecording(){
+  audioChunks = [];
+  try {
+    mediaRecorder = new MediaRecorder(mediaStream);
+    mediaRecorder.ondataavailable = e => { if(e.data.size > 0) audioChunks.push(e.data); };
+    mediaRecorder.start();
+  } catch(err){ console.log(err); }
+}
+function stopRecording(callback){
+  if(!mediaRecorder){ callback(null); return; }
+  mediaRecorder.onstop = () => {
+    const blob = new Blob(audioChunks, { type: 'audio/webm' });
+    callback(URL.createObjectURL(blob));
+  };
+  try { mediaRecorder.stop(); } catch(err){ callback(null); }
+}
+function startRecognition(){
+  liveTranscript = '';
+  const box = document.getElementById('live-transcript');
+  if(!SpeechRecognitionCtor){ box.style.display='none'; return; }
+  box.style.display = 'block';
+  box.innerHTML = '<span class="placeholder">말하기를 시작하면 여기에 실시간으로 텍스트가 나타나요...</span>';
+  recognition = new SpeechRecognitionCtor();
+  recognition.lang = 'en-US';
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.onresult = (event) => {
+    let text = '';
+    for(let i=0;i<event.results.length;i++){ text += event.results[i][0].transcript; }
+    liveTranscript = text;
+    box.textContent = text || '...';
+  };
+  recognition.onerror = (e) => { console.log(e.error); };
+  try { recognition.start(); } catch(err){ console.log(err); }
+}
+function stopRecognition(){ if(recognition){ try{ recognition.stop(); }catch(err){} } }
+
+let currentPhaseOnDone = null;
+function runPhase(seconds, isPrep, onDone){
+  const tag = document.getElementById('phase-tag');
+  const hint = document.getElementById('phase-hint');
+  const ring = document.getElementById('timer-ring-fg');
+  const numberEl = document.getElementById('timer-number');
+  const stopEarlyBtn = document.getElementById('stop-early-btn');
+  const skipPrepBtn = document.getElementById('skip-prep-btn');
+  currentPhaseOnDone = onDone;
+  tag.innerHTML = isPrep ? '준비 시간' : '<span class="rec-dot"></span>답변 시간 — 소리 내어 읽으세요';
+  tag.className = 'phase-tag ' + (isPrep ? 'prep' : 'answer');
+  ring.style.stroke = isPrep ? 'var(--amber)' : 'var(--accent)';
+  hint.textContent = isPrep ? '지문을 눈으로 읽으며 발음/억양을 준비하세요.' : '지금부터 지문을 소리 내어 읽어보세요.';
+  stopEarlyBtn.style.display = isPrep ? 'none' : 'block';
+  skipPrepBtn.style.display = isPrep ? 'block' : 'none';
+  if(!isPrep){ startRecording(); startRecognition(); }
+  let remaining = seconds;
+  numberEl.textContent = remaining;
+  ring.style.strokeDashoffset = 0;
+  clearInterval(timerInterval);
+  timerInterval = setInterval(()=>{
+    remaining--;
+    numberEl.textContent = Math.max(remaining,0);
+    ring.style.strokeDashoffset = CIRC * ((seconds - remaining) / seconds);
+    if(remaining <= 0){ clearInterval(timerInterval); onDone(); }
+  }, 1000);
+}
+document.getElementById('stop-early-btn').addEventListener('click', finishAnswerPhase);
+document.getElementById('skip-prep-btn').addEventListener('click', ()=>{
+  clearInterval(timerInterval);
+  document.getElementById('skip-prep-btn').style.display = 'none';
+  if(currentPhaseOnDone) currentPhaseOnDone();
+});
+
+function startQuestion(){
+  const q = currentTopic.questions[currentQIndex];
+  document.getElementById('q-label').textContent = q.label + ' · 준비 ' + q.prep + '초 / 답변 ' + q.answer + '초';
+  document.getElementById('passage-image').src = q.image;
+  renderSteps();
+  showScreen('screen-question');
+  runPhase(q.prep, true, ()=>{
+    runPhase(q.answer, false, ()=>{ finishAnswerPhase(); });
+  });
+}
+function finishAnswerPhase(){
+  clearInterval(timerInterval);
+  document.getElementById('stop-early-btn').style.display = 'none';
+  stopRecognition();
+  stopRecording((url)=>{
+    const q = currentTopic.questions[currentQIndex];
+    q._recordedUrl = url;
+    q._transcript = liveTranscript;
+    showReview();
+  });
+}
+function showReview(){
+  const q = currentTopic.questions[currentQIndex];
+  document.getElementById('review-q-label').textContent = q.label;
+  document.getElementById('r-passage-image').src = q.image;
+  document.getElementById('review-answer').textContent = q.myAnswer;
+  const audioEl = document.getElementById('review-audio');
+  if(q._recordedUrl){ audioEl.src = q._recordedUrl; audioEl.style.display='block'; }
+  else { audioEl.style.display='none'; }
+  const transcriptEl = document.getElementById('review-transcript');
+  transcriptEl.textContent = q._transcript && q._transcript.trim() ? q._transcript : '(인식된 텍스트가 없어요.)';
+  showScreen('screen-review');
+}
+document.getElementById('repeat-btn').addEventListener('click', startQuestion);
+document.getElementById('continue-btn').addEventListener('click', ()=>{
+  currentQIndex++;
+  if(currentQIndex >= currentTopic.questions.length){
+    showScreen('screen-done');
+  } else {
+    startQuestion();
+  }
+});
+document.getElementById('restart-btn').addEventListener('click', ()=>{ currentQIndex = 0; startQuestion(); });
+
+// ---- Create new set ----
+let pendingImages = [null, null];
+
+function openCreateScreen(){
+  document.getElementById('new-title-input').value = '';
+  document.getElementById('q1-answer-input').value = '';
+  document.getElementById('q2-answer-input').value = '';
+  [0,1].forEach(i=>{
+    pendingImages[i] = null;
+    document.getElementById('paste-preview-'+i).style.display = 'none';
+    document.getElementById('paste-placeholder-'+i).style.display = 'block';
+    document.getElementById('rec-status-'+i).textContent = '';
+    document.getElementById('rec-btn-'+i).textContent = '🎙️ 읽고 녹음하기';
+  });
+  showScreen('screen-create');
+}
+
+function compressImage(dataUrl, callback){
+  const img = new Image();
+  img.onload = ()=>{
+    const maxW = 900;
+    const scale = Math.min(1, maxW / img.width);
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width * scale;
+    canvas.height = img.height * scale;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    callback(canvas.toDataURL('image/jpeg', 0.85));
+  };
+  img.src = dataUrl;
+}
+function handleImageFileFor(idx, file){
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    compressImage(e.target.result, (compressed)=>{
+      pendingImages[idx] = compressed;
+      const previewEl = document.getElementById('paste-preview-'+idx);
+      previewEl.src = compressed;
+      previewEl.style.display = 'block';
+      document.getElementById('paste-placeholder-'+idx).style.display = 'none';
+    });
+  };
+  reader.readAsDataURL(file);
+}
+[0,1].forEach(idx=>{
+  const area = document.getElementById('paste-area-'+idx);
+  area.addEventListener('paste', (e)=>{
+    const items = e.clipboardData.items;
+    for(let i=0;i<items.length;i++){
+      if(items[i].type.indexOf('image') !== -1){ handleImageFileFor(idx, items[i].getAsFile()); break; }
+    }
+  });
+  area.addEventListener('click', ()=>{ area.focus(); });
+  document.getElementById('choose-file-btn-'+idx).addEventListener('click', ()=>{
+    document.getElementById('file-input-'+idx).click();
+  });
+  document.getElementById('file-input-'+idx).addEventListener('change', (e)=>{
+    if(e.target.files[0]) handleImageFileFor(idx, e.target.files[0]);
+  });
+});
+
+let activeRecordingTarget = null;
+let activeRecognitionObj = null;
+const answerInputIds = ['q1-answer-input','q2-answer-input'];
+
+async function toggleFieldRecording(idx){
+  const targetInputId = answerInputIds[idx];
+  const btn = document.getElementById('rec-btn-'+idx);
+  const statusEl = document.getElementById('rec-status-'+idx);
+  if(activeRecordingTarget === null){
+    if(!mediaStream){
+      try { mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+      catch(err){ statusEl.textContent = '마이크 권한이 필요해요.'; return; }
+    }
+    activeRecordingTarget = targetInputId;
+    btn.textContent = '⏹ 녹음 종료';
+    statusEl.textContent = '🔴 녹음 중... 지문을 읽어보세요.';
+    if(SpeechRecognitionCtor){
+      activeRecognitionObj = new SpeechRecognitionCtor();
+      activeRecognitionObj.lang = 'en-US';
+      activeRecognitionObj.continuous = true;
+      activeRecognitionObj.interimResults = true;
+      activeRecognitionObj.onresult = (event)=>{
+        let text = '';
+        for(let i=0;i<event.results.length;i++){ text += event.results[i][0].transcript; }
+        document.getElementById(targetInputId).value = text;
+      };
+      try { activeRecognitionObj.start(); } catch(err){ console.log(err); }
+    } else {
+      statusEl.textContent = '자동 인식 미지원 브라우저 — 직접 입력하세요.';
+    }
+  } else if(activeRecordingTarget === targetInputId){
+    activeRecordingTarget = null;
+    btn.textContent = '🎙️ 읽고 녹음하기';
+    statusEl.textContent = '✓ 완료. 텍스트를 확인/수정하세요.';
+    if(activeRecognitionObj){ try{ activeRecognitionObj.stop(); }catch(err){} }
+  } else {
+    alert('다른 녹음이 진행 중이에요. 먼저 종료해주세요.');
+  }
+}
+[0,1].forEach(idx=>{
+  document.getElementById('rec-btn-'+idx).addEventListener('click', ()=>toggleFieldRecording(idx));
+});
+
+document.getElementById('save-set-btn').addEventListener('click', ()=>{
+  if(!pendingImages[0] || !pendingImages[1]){ alert('Q1, Q2 지문 사진을 모두 추가해주세요.'); return; }
+  const a1 = document.getElementById('q1-answer-input').value.trim();
+  const a2 = document.getElementById('q2-answer-input').value.trim();
+  if(!a1 || !a2){ alert('Q1, Q2 모두 읽고 녹음해서 참고 텍스트를 만들어주세요.'); return; }
+  const title = document.getElementById('new-title-input').value.trim() || ('[내 세트 ' + (customTopics.length+1) + ']');
+  customTopics.push({
+    title: title,
+    questions: [
+      { label: "Question 1", prep: 45, answer: 45, image: pendingImages[0], myAnswer: a1 },
+      { label: "Question 2", prep: 45, answer: 45, image: pendingImages[1], myAnswer: a2 }
+    ]
+  });
+  saveCustomTopics();
+  renderTopicList();
+  showScreen('screen-select');
+});
+
+document.getElementById('export-btn').addEventListener('click', ()=>{
+  if(customTopics.length === 0){ alert('내보낼 세트가 없어요.'); return; }
+  const blob = new Blob([JSON.stringify(customTopics, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'q12_my_sets.json'; a.click();
+  URL.revokeObjectURL(url);
+});
+document.getElementById('import-btn').addEventListener('click', ()=>{ document.getElementById('import-file').click(); });
+document.getElementById('import-file').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (evt)=>{
+    try {
+      const imported = JSON.parse(evt.target.result);
+      if(Array.isArray(imported)){
+        customTopics = customTopics.concat(imported);
+        saveCustomTopics();
+        renderTopicList();
+        alert(imported.length + '개 세트를 가져왔어요.');
+      }
+    } catch(err){ alert('JSON 파일을 읽을 수 없어요.'); }
+  };
+  reader.readAsText(file);
+});
+</script>
+</body>
+</html>
