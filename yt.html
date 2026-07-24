@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>유튜브 모의고사 비교 연습</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap');
+  :root {
+    --bg: #0f1319; --surface: #1a2029; --surface-2: #222937; --border: #2e3646;
+    --text-primary: #eef1f6; --text-secondary: #9aa5b6; --text-muted: #6b7688;
+    --accent: #5b9bff; --accent-soft: rgba(91,155,255,0.12);
+    --success: #4fd68f; --success-soft: rgba(79,214,143,0.12);
+    --danger: #ff6b6b; --danger-soft: rgba(255,107,107,0.14);
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: radial-gradient(circle at 50% 0%, #171d27 0%, #0f1319 60%); color: var(--text-primary); font-family: 'Noto Sans KR', 'Manrope', sans-serif; min-height: 100vh; padding: 32px 16px 60px; display: flex; justify-content: center; }
+  .wrap { width: 100%; max-width: 560px; }
+  header { margin-bottom: 22px; }
+  .eyebrow { font-family: 'Manrope', sans-serif; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 800; margin-bottom: 8px; }
+  h1 { font-size: 22px; font-weight: 800; margin: 0 0 6px; }
+  .subtitle { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+  .steps { display: flex; gap: 5px; margin: 20px 0; flex-wrap: wrap; }
+  .step-pill { flex: 1; min-width: 14px; height: 5px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
+  .step-pill-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.4s ease; }
+  .step-pill.done .step-pill-fill { width: 100%; background: var(--success); }
+  .step-pill.active .step-pill-fill { width: 100%; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+  .mic-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom:16px; }
+  .mic-status { font-weight: 700; margin-bottom: 6px; }
+  .mic-status.granted { color: var(--success); }
+  .mic-status.denied { color: var(--danger); }
+  .action-btn { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--accent); color: #0a0e14; font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 14px; cursor: pointer; margin-top:14px; }
+  .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .action-btn.secondary { background: var(--surface-2); color: var(--text-primary); border: 1px solid var(--border); }
+  .action-btn.danger { background: var(--danger-soft); color: var(--danger); border: 1px solid var(--danger); }
+  .btn-row { display: flex; gap: 10px; }
+  .btn-row .action-btn { flex: 1; }
+  .back-link { display:inline-block; margin-bottom:14px; font-size:13px; color:var(--text-muted); cursor:pointer; text-decoration:none; }
+  .back-link:hover { color: var(--accent); }
+  .toolbar-row { display:flex; gap:8px; margin-bottom:14px; }
+  .toolbar-row .action-btn { flex:1; font-size:12px; padding:10px; margin-top:0; }
+  .topic-list { display:flex; flex-direction:column; gap:10px; }
+  .topic-list-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; cursor:pointer; position:relative; }
+  .topic-list-card:hover { border-color: var(--accent); }
+  .topic-list-card .tlc-title { font-family:'Manrope',sans-serif; font-weight:700; font-size:14px; margin-bottom:4px; }
+  .topic-list-card .tlc-desc { font-size:12px; color: var(--text-muted); line-height:1.5; }
+  .add-card-row { background: var(--surface); border: 1px dashed var(--border); border-radius: 14px; padding: 16px 18px; cursor:pointer; text-align:center; color: var(--text-muted); font-size:14px; }
+  .add-card-row:hover { border-color: var(--accent); color: var(--accent); }
+  .edit-btn-row { position:absolute; top:10px; right:40px; width:24px; height:24px; border-radius:50%; background:rgba(15,19,25,0.8); color: var(--accent); border: none; font-size:12px; cursor:pointer; }
+  .del-btn-row { position:absolute; top:10px; right:10px; width:24px; height:24px; border-radius:50%; background:rgba(15,19,25,0.8); color: var(--danger); border: none; font-size:14px; cursor:pointer; }
+  .q-label { font-family: 'Manrope', sans-serif; font-size: 12px; font-weight: 800; letter-spacing: 0.08em; color: var(--accent); text-transform: uppercase; margin-bottom: 12px; }
+  .video-embed-wrap { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); margin-bottom: 16px; background: var(--surface-2); }
+  .video-embed-wrap iframe { position: absolute; top:0; left:0; width:100%; height:100%; border:0; }
+  .rec-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; text-align: center; }
+  .rec-dot { display:inline-block; width:8px; height:8px; border-radius:50%; background: var(--danger); margin-right:6px; animation: pulse 1s infinite; vertical-align:middle; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+  .rec-status-text { font-size: 13px; color: var(--text-secondary); margin-bottom: 14px; }
+  .live-transcript { margin-top: 12px; min-height: 60px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; font-size: 13px; color: var(--text-primary); text-align: left; line-height: 1.6; }
+  .live-transcript .placeholder { color: var(--text-muted); }
+  .done-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px 22px; text-align: center; }
+  .done-card .big { font-size: 40px; margin-bottom: 8px; }
+  .done-card p { color: var(--text-secondary); font-size: 14px; line-height: 1.6; }
+  .field-label { font-size:12px; color: var(--text-muted); margin: 16px 0 6px; }
+  .text-input { width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background: var(--surface-2); color: var(--text-primary); font-family:'Noto Sans KR',sans-serif; font-size:14px; }
+  textarea.text-input { min-height: 70px; resize: vertical; line-height:1.6; }
+  .mini-status { font-size:12px; color: var(--text-muted); text-align:center; margin-top:6px; }
+  .footer-note { margin-top: 28px; font-size: 12px; color: var(--text-muted); text-align: center; line-height: 1.6; }
+  .qblock { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-top: 14px; position: relative; }
+  .qblock-title { font-family:'Manrope',sans-serif; font-weight:800; font-size:12px; color: var(--accent); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
+  .qblock-del { background: var(--danger-soft); color: var(--danger); border: 1px solid var(--danger); border-radius: 8px; padding: 4px 10px; font-size: 11px; cursor: pointer; }
+  .review-item { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+  .review-item-label { font-family:'Manrope',sans-serif; font-weight:800; font-size:12px; color: var(--accent); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:10px; }
+  .review-block { margin-top: 12px; }
+  .review-label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+  .review-text { background: var(--success-soft); border-radius: 10px; padding: 12px 14px; font-size: 13px; line-height: 1.6; color: var(--text-primary); }
+  .review-text.transcript-box { background: var(--surface-2); }
+  audio { width: 100%; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">YouTube Mock Test · Full Set Practice</div>
+    <h1>유튜브 모의고사 비교 연습</h1>
+    <div class="subtitle">문제마다 녹음 버튼을 눌러 답변하고, 끝까지 다 풀면 내 녹음/텍스트와 모범답변을 한 번에 비교하세요.</div>
+  </header>
+
+  <div class="steps" id="steps" style="display:none;"></div>
+
+  <div class="screen active" id="screen-mic">
+    <div class="mic-box">
+      <div class="mic-status pending" id="mic-status">마이크 연결 안 됨</div>
+      <div id="mic-desc">답변을 녹음하고 자동 인식하려면 마이크 권한이 필요해요.</div>
+    </div>
+    <button class="action-btn" id="mic-btn">마이크 권한 허용하기</button>
+  </div>
+
+  <div class="screen" id="screen-select">
+    <a href="index.html" class="back-link">← 홈으로</a>
+    <div class="toolbar-row">
+      <button class="action-btn secondary" id="export-btn">⬇ 내보내기</button>
+      <button class="action-btn secondary" id="import-btn">⬆ 가져오기</button>
+      <input type="file" id="import-file" accept="application/json" style="display:none;">
+    </div>
+    <div class="topic-list" id="topic-list"></div>
+  </div>
+
+  <div class="screen" id="screen-question">
+    <span class="back-link" id="back-to-list-1">← 목록으로</span>
+    <div class="q-label" id="q-label"></div>
+    <div class="video-embed-wrap" id="video-embed-wrap"></div>
+    <div class="rec-card">
+      <div class="rec-status-text" id="rec-status-text">준비되면 녹음 버튼을 눌러주세요.</div>
+      <button class="action-btn" id="rec-toggle-btn">🎙️ 녹음 시작</button>
+      <div class="live-transcript" id="live-transcript" style="display:none;"><span class="placeholder">말하기를 시작하면 여기에 실시간으로 텍스트가 나타나요...</span></div>
+      <button class="action-btn secondary" id="next-question-btn" style="display:none;">다음 문제 →</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-done">
+    <div class="done-card">
+      <div class="big">🎯</div>
+      <h2 style="margin:0 0 8px; font-size:18px;">모의고사 완료!</h2>
+      <p>이제 아래 버튼을 눌러서 문제 전체를 한 번에 비교해보세요.</p>
+    </div>
+    <button class="action-btn" id="show-full-review-btn">📊 전체 결과 비교하기</button>
+    <button class="action-btn secondary" id="back-to-list-done">목록으로</button>
+  </div>
+
+  <div class="screen" id="screen-full-review">
+    <span class="back-link" id="back-to-list-2">← 목록으로</span>
+    <div class="q-label">전체 결과 비교</div>
+    <div id="full-review-list"></div>
+    <button class="action-btn secondary" id="back-to-list-3">목록으로</button>
+  </div>
+
+  <div class="screen" id="screen-create">
+    <span class="back-link" id="back-to-list-4">← 목록으로</span>
+    <div class="q-label" id="create-screen-label">새 모의고사 세트 추가</div>
+
+    <div class="field-label">유튜브 영상 URL</div>
+    <input type="text" class="text-input" id="new-video-url" placeholder="https://www.youtube.com/watch?v=...">
+    <button class="action-btn secondary" id="preview-video-btn" style="margin-top:10px;">🔍 영상 미리보기</button>
+    <div class="video-embed-wrap" id="create-video-embed-wrap" style="display:none; margin-top:14px;"></div>
+
+    <div class="field-label">세트 이름 (선택)</div>
+    <input type="text" class="text-input" id="new-title-input" placeholder="예: 실전 모의고사 1회">
+
+    <div id="qblocks-container"></div>
+    <button class="action-btn secondary" id="add-qblock-btn" style="margin-top:14px;">+ 문제 추가</button>
+
+    <button class="action-btn" id="save-set-btn" style="margin-top:16px;">✅ 이 세트 저장하기</button>
+  </div>
+
+  <div class="footer-note">유튜브 영상은 저장 없이 링크만 참조돼요. 음성 인식은 Chrome 브라우저에서 가장 잘 작동해요.</div>
+</div>
+
+<script>
+const STORAGE_KEY = 'toeic_yt_custom_v3';
+function loadCustomTopics(){ try { const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : []; } catch(err){ return []; } }
+function saveCustomTopics(){ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(customTopics)); } catch(err){} }
+let customTopics = loadCustomTopics();
+
+function extractYouTubeId(url){
+  if(!url) return null;
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=)([\w-]{11})/,
+    /(?:youtu\.be\/)([\w-]{11})/,
+    /(?:youtube\.com\/embed\/)([\w-]{11})/,
+    /(?:youtube\.com\/shorts\/)([\w-]{11})/
+  ];
+  for(const p of patterns){
+    const m = url.match(p);
+    if(m) return m[1];
+  }
+  return null;
+}
+function buildEmbedUrl(videoId, startSeconds){
+  let url = 'https://www.youtube.com/embed/' + videoId + '?rel=0';
+  if(startSeconds){ url += '&start=' + Math.floor(startSeconds); }
+  return url;
+}
+
+let topics = customTopics;
+function rebuildTopics(){ topics = customTopics; }
+
+let currentTopicIndex = 0;
+let currentTopic = null;
+let currentQIndex = 0;
+let mediaStream = null;
+let mediaRecorder = null;
+let audioChunks = [];
+let recognition = null;
+let liveTranscript = '';
+let isRecording = false;
+const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('steps').style.display = (id === 'screen-question') ? 'flex' : 'none';
+}
+
+document.getElementById('mic-btn').addEventListener('click', async ()=>{
+  const statusEl = document.getElementById('mic-status');
+  const descEl = document.getElementById('mic-desc');
+  statusEl.textContent = '권한 요청 중...';
+  try {
+    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    statusEl.textContent = '✓ 마이크 연결됨';
+    statusEl.className = 'mic-status granted';
+    descEl.textContent = '이제 세트를 골라서 연습할 수 있어요.';
+    setTimeout(()=>{ renderTopicList(); showScreen('screen-select'); }, 500);
+  } catch(err) {
+    statusEl.textContent = '✗ 마이크 권한이 거부되었어요';
+    statusEl.className = 'mic-status denied';
+    descEl.textContent = '브라우저 사이트 정보 아이콘에서 마이크 권한을 허용한 뒤 새로고침 해주세요.';
+  }
+});
+
+function renderTopicList(){
+  rebuildTopics();
+  const list = document.getElementById('topic-list');
+  list.innerHTML = '';
+  const addCard = document.createElement('div');
+  addCard.className = 'add-card-row';
+  addCard.textContent = '+ 새 모의고사 세트 추가';
+  addCard.addEventListener('click', ()=>openCreateScreen(null));
+  list.appendChild(addCard);
+
+  if(topics.length === 0){
+    const emptyMsg = document.createElement('div');
+    emptyMsg.style.cssText = 'text-align:center; color:var(--text-muted); font-size:13px; padding:20px;';
+    emptyMsg.textContent = '아직 등록된 세트가 없어요.';
+    list.appendChild(emptyMsg);
+  }
+
+  topics.forEach((t,i)=>{
+    const card = document.createElement('div');
+    card.className = 'topic-list-card';
+    card.innerHTML = '<div class="tlc-title">'+t.title+'</div><div class="tlc-desc">문제 '+t.questions.length+'개</div>';
+    card.addEventListener('click', ()=>{ currentTopicIndex = i; currentTopic = topics[i]; currentQIndex = 0; startQuestion(); });
+    const editBtn = document.createElement('button');
+    editBtn.className = 'edit-btn-row';
+    editBtn.textContent = '✏️';
+    editBtn.addEventListener('click', (e)=>{ e.stopPropagation(); openCreateScreen(i); });
+    card.appendChild(editBtn);
+    const delBtn = document.createElement('button');
+    delBtn.className = 'del-btn-row';
+    delBtn.textContent = '×';
+    delBtn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      if(confirm('이 세트를 삭제할까요?')){
+        customTopics.splice(i, 1);
+        saveCustomTopics();
+        renderTopicList();
+      }
+    });
+    card.appendChild(delBtn);
+    list.appendChild(card);
+  });
+}
+document.getElementById('back-to-list-1').addEventListener('click', ()=>{
+  stopRecognition();
+  if(mediaRecorder && isRecording){ try{ mediaRecorder.stop(); }catch(err){} }
+  renderTopicList();
+  showScreen('screen-select');
+});
+document.getElementById('back-to-list-done').addEventListener('click', ()=>{ renderTopicList(); showScreen('screen-select'); });
+document.getElementById('back-to-list-2').addEventListener('click', ()=>{ renderTopicList(); showScreen('screen-select'); });
+document.getElementById('back-to-list-3').addEventListener('click', ()=>{ renderTopicList(); showScreen('screen-select'); });
+document.getElementById('back-to-list-4').addEventListener('click', ()=>{ renderTopicList(); showScreen('screen-select'); });
+
+function renderSteps(){
+  const stepsDiv = document.getElementById('steps');
+  stepsDiv.innerHTML = '';
+  currentTopic.questions.forEach((q,i)=>{
+    const pill = document.createElement('div');
+    pill.className = 'step-pill';
+    if(i < currentQIndex) pill.classList.add('done');
+    else if(i === currentQIndex) pill.classList.add('active');
+    pill.innerHTML = '<div class="step-pill-fill"></div>';
+    stepsDiv.appendChild(pill);
+  });
+}
+
+function startRecordingAudio(){
+  audioChunks = [];
+  try {
+    mediaRecorder = new MediaRecorder(mediaStream);
+    mediaRecorder.ondataavailable = e => { if(e.data.size > 0) audioChunks.push(e.data); };
+    mediaRecorder.start();
+  } catch(err){ console.log(err); }
+}
+function stopRecordingAudio(callback){
+  if(!mediaRecorder){ callback(null); return; }
+  mediaRecorder.onstop = () => {
+    const blob = new Blob(audioChunks, { type: 'audio/webm' });
+    callback(URL.createObjectURL(blob));
+  };
+  try { mediaRecorder.stop(); } catch(err){ callback(null); }
+}
+function startRecognition(){
+  liveTranscript = '';
+  const box = document.getElementById('live-transcript');
+  if(!SpeechRecognitionCtor){ box.style.display='none'; return; }
+  box.style.display = 'block';
+  box.innerHTML = '<span class="placeholder">말하기를 시작하면 여기에 실시간으로 텍스트가 나타나요...</span>';
+  recognition = new SpeechRecognitionCtor();
+  recognition.lang = 'en-US';
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.onresult = (event) => {
+    let text = '';
+    for(let i=0;i<event.results.length;i++){ text += event.results[i][0].transcript; }
+    liveTranscript = text;
+    box.textContent = text || '...';
+  };
+  recognition.onerror = (e) => { console.log(e.error); };
+  try { recognition.start(); } catch(err){ console.log(err); }
+}
+function stopRecognition(){ if(recognition){ try{ recognition.stop(); }catch(err){} } }
+
+function startQuestion(){
+  const q = currentTopic.questions[currentQIndex];
+  document.getElementById('q-label').textContent = '문제 ' + (currentQIndex+1) + ' / ' + currentTopic.questions.length;
+  const embedWrap = document.getElementById('video-embed-wrap');
+  embedWrap.innerHTML = '<iframe src="'+buildEmbedUrl(currentTopic.videoId, q.startTime)+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+  document.getElementById('rec-status-text').textContent = '영상을 재생해서 문제를 들은 뒤, 답변을 녹음하세요.';
+  document.getElementById('rec-toggle-btn').textContent = '🎙️ 녹음 시작';
+  document.getElementById('rec-toggle-btn').style.display = 'block';
+  document.getElementById('next-question-btn').style.display = 'none';
+  document.getElementById('live-transcript').style.display = 'none';
+  isRecording = false;
+  renderSteps();
+  showScreen('screen-question');
+}
+
+document.getElementById('rec-toggle-btn').addEventListener('click', ()=>{
+  const btn = document.getElementById('rec-toggle-btn');
+  const statusText = document.getElementById('rec-status-text');
+  if(!isRecording){
+    isRecording = true;
+    btn.textContent = '⏹ 녹음 종료';
+    statusText.innerHTML = '<span class="rec-dot"></span>녹음 중... 답변을 말해보세요.';
+    startRecordingAudio();
+    startRecognition();
+  } else {
+    isRecording = false;
+    btn.style.display = 'none';
+    statusText.textContent = '녹음 완료! 아래에서 텍스트를 확인하세요.';
+    stopRecognition();
+    stopRecordingAudio((url)=>{
+      const q = currentTopic.questions[currentQIndex];
+      q._recordedUrl = url;
+      q._transcript = liveTranscript;
+      document.getElementById('next-question-btn').style.display = 'block';
+    });
+  }
+});
+
+document.getElementById('next-question-btn').addEventListener('click', ()=>{
+  currentQIndex++;
+  if(currentQIndex >= currentTopic.questions.length){
+    showScreen('screen-done');
+  } else {
+    startQuestion();
+  }
+});
+
+document.getElementById('show-full-review-btn').addEventListener('click', showFullReview);
+function showFullReview(){
+  const listEl = document.getElementById('full-review-list');
+  listEl.innerHTML = '';
+  currentTopic.questions.forEach((q, i)=>{
+    const item = document.createElement('div');
+    item.className = 'review-item';
+    let html = '<div class="review-item-label">문제 '+(i+1)+'</div>';
+    html += '<div class="video-embed-wrap"><iframe src="'+buildEmbedUrl(currentTopic.videoId, q.startTime)+'" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>';
+    html += '<div class="review-block"><div class="review-label">🎧 내 녹음 듣기</div>';
+    item.innerHTML = html;
+    const audioEl = document.createElement('audio');
+    audioEl.controls = true;
+    if(q._recordedUrl) audioEl.src = q._recordedUrl;
+    item.appendChild(audioEl);
+
+    const transcriptBlock = document.createElement('div');
+    transcriptBlock.className = 'review-block';
+    transcriptBlock.innerHTML = '<div class="review-label">📝 자동 인식된 내 답변</div><div class="review-text transcript-box">'+ (q._transcript && q._transcript.trim() ? q._transcript : '(인식된 텍스트가 없어요.)') +'</div>';
+    item.appendChild(transcriptBlock);
+
+    const answerBlock = document.createElement('div');
+    answerBlock.className = 'review-block';
+    answerBlock.innerHTML = '<div class="review-label">✅ 유튜브 모범답변</div><div class="review-text">'+ q.answer_text +'</div>';
+    item.appendChild(answerBlock);
+
+    listEl.appendChild(item);
+  });
+  showScreen('screen-full-review');
+}
+
+// ---- Create new set ----
+let editingIndex = null;
+let qblockCount = 0;
+
+function openCreateScreen(editIdx){
+  editingIndex = (typeof editIdx === 'number') ? editIdx : null;
+  document.getElementById('new-video-url').value = '';
+  document.getElementById('new-title-input').value = '';
+  document.getElementById('create-video-embed-wrap').style.display = 'none';
+  document.getElementById('create-video-embed-wrap').innerHTML = '';
+  document.getElementById('qblocks-container').innerHTML = '';
+  qblockCount = 0;
+
+  if(editingIndex !== null){
+    const t = customTopics[editingIndex];
+    document.getElementById('new-video-url').value = 'https://www.youtube.com/watch?v=' + t.videoId;
+    document.getElementById('new-title-input').value = t.title;
+    const embedWrap = document.getElementById('create-video-embed-wrap');
+    embedWrap.innerHTML = '<iframe src="'+buildEmbedUrl(t.videoId, 0)+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+    embedWrap.style.display = 'block';
+    t.questions.forEach(q=>{ addQBlock(q); });
+    document.getElementById('create-screen-label').textContent = '모의고사 세트 수정';
+    document.getElementById('save-set-btn').textContent = '✅ 수정 내용 저장하기';
+  } else {
+    addQBlock(null);
+    document.getElementById('create-screen-label').textContent = '새 모의고사 세트 추가';
+    document.getElementById('save-set-btn').textContent = '✅ 이 세트 저장하기';
+  }
+  showScreen('screen-create');
+}
+
+function addQBlock(existingData){
+  qblockCount++;
+  const idx = qblockCount;
+  const container = document.getElementById('qblocks-container');
+  const block = document.createElement('div');
+  block.className = 'qblock';
+  block.setAttribute('data-qidx', idx);
+  block.innerHTML = `
+    <div class="qblock-title"><span>문제 ${idx}</span><button type="button" class="qblock-del">삭제</button></div>
+    <div class="field-label" style="margin-top:0;">이 문제 시작 시간 (초, 선택)</div>
+    <input type="number" class="text-input qb-start" placeholder="예: 125">
+    <div class="field-label">유튜브 모범답변 (직접 입력하거나, 읽어서 녹음)</div>
+    <div style="display:flex; gap:8px; margin-top:8px;"><button type="button" class="action-btn secondary qb-rec-btn" style="margin-top:0;">🎙️ 읽고 녹음하기</button></div>
+    <div class="mini-status qb-rec-status"></div>
+    <textarea class="text-input qb-answer-text" placeholder="모범답변 텍스트" style="margin-top:8px;"></textarea>
+  `;
+  container.appendChild(block);
+
+  if(existingData){
+    block.querySelector('.qb-start').value = existingData.startTime || '';
+    block.querySelector('.qb-answer-text').value = existingData.answer_text;
+  }
+
+  block.querySelector('.qblock-del').addEventListener('click', ()=>{
+    if(document.querySelectorAll('.qblock').length <= 1){ alert('최소 1개의 문제가 필요해요.'); return; }
+    block.remove();
+  });
+
+  let blockRecording = false;
+  let blockRecognitionObj = null;
+  const recBtn = block.querySelector('.qb-rec-btn');
+  const recStatus = block.querySelector('.qb-rec-status');
+  const answerTextarea = block.querySelector('.qb-answer-text');
+  recBtn.addEventListener('click', async ()=>{
+    if(!blockRecording){
+      if(!mediaStream){
+        try { mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+        catch(err){ recStatus.textContent = '마이크 권한이 필요해요.'; return; }
+      }
+      blockRecording = true;
+      recBtn.textContent = '⏹ 녹음 종료';
+      recStatus.textContent = '🔴 녹음 중...';
+      if(SpeechRecognitionCtor){
+        blockRecognitionObj = new SpeechRecognitionCtor();
+        blockRecognitionObj.lang = 'en-US';
+        blockRecognitionObj.continuous = true;
+        blockRecognitionObj.interimResults = true;
+        blockRecognitionObj.onresult = (event)=>{
+          let text = '';
+          for(let i=0;i<event.results.length;i++){ text += event.results[i][0].transcript; }
+          answerTextarea.value = text;
+        };
+        try { blockRecognitionObj.start(); } catch(err){ console.log(err); }
+      } else {
+        recStatus.textContent = '자동 인식 미지원 브라우저 — 직접 입력하세요.';
+      }
+    } else {
+      blockRecording = false;
+      recBtn.textContent = '🎙️ 읽고 녹음하기';
+      recStatus.textContent = '✓ 완료. 텍스트를 확인/수정하세요.';
+      if(blockRecognitionObj){ try{ blockRecognitionObj.stop(); }catch(err){} }
+    }
+  });
+}
+
+document.getElementById('add-qblock-btn').addEventListener('click', ()=>addQBlock(null));
+
+document.getElementById('preview-video-btn').addEventListener('click', ()=>{
+  const url = document.getElementById('new-video-url').value.trim();
+  const videoId = extractYouTubeId(url);
+  const embedWrap = document.getElementById('create-video-embed-wrap');
+  if(!videoId){
+    alert('올바른 유튜브 링크가 아니에요. URL을 확인해주세요.');
+    embedWrap.style.display = 'none';
+    return;
+  }
+  embedWrap.innerHTML = '<iframe src="'+buildEmbedUrl(videoId, 0)+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+  embedWrap.style.display = 'block';
+});
+
+document.getElementById('save-set-btn').addEventListener('click', ()=>{
+  const url = document.getElementById('new-video-url').value.trim();
+  const videoId = extractYouTubeId(url);
+  if(!videoId){ alert('올바른 유튜브 링크를 입력해주세요.'); return; }
+
+  const blocks = document.querySelectorAll('.qblock');
+  const questions = [];
+  for(const block of blocks){
+    const answerText = block.querySelector('.qb-answer-text').value.trim();
+    if(!answerText){ alert('모든 문제에 모범답변을 입력하거나 녹음해주세요.'); return; }
+    questions.push({
+      startTime: parseInt(block.querySelector('.qb-start').value) || 0,
+      answer_text: answerText
+    });
+  }
+
+  const title = document.getElementById('new-title-input').value.trim() || ('[내 세트 ' + (customTopics.length+1) + ']');
+  const newEntry = { title: title, videoId: videoId, questions: questions };
+
+  if(editingIndex !== null){
+    customTopics[editingIndex] = newEntry;
+  } else {
+    customTopics.push(newEntry);
+  }
+  saveCustomTopics();
+  renderTopicList();
+  showScreen('screen-select');
+});
+
+document.getElementById('export-btn').addEventListener('click', ()=>{
+  if(customTopics.length === 0){ alert('내보낼 세트가 없어요.'); return; }
+  const blob = new Blob([JSON.stringify(customTopics, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'yt_practice_sets.json'; a.click();
+  URL.revokeObjectURL(url);
+});
+document.getElementById('import-btn').addEventListener('click', ()=>{ document.getElementById('import-file').click(); });
+document.getElementById('import-file').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (evt)=>{
+    try {
+      const imported = JSON.parse(evt.target.result);
+      if(Array.isArray(imported)){
+        customTopics = customTopics.concat(imported);
+        saveCustomTopics();
+        renderTopicList();
+        alert(imported.length + '개 세트를 가져왔어요.');
+      }
+    } catch(err){ alert('JSON 파일을 읽을 수 없어요.'); }
+  };
+  reader.readAsText(file);
+});
+</script>
+</body>
+</html>
